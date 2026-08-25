@@ -1,7 +1,14 @@
 # NotebookLM KB System — a token-efficient "second brain" for AI agents
 
+> **TL;DR — what is this?** The **NotebookLM KB System** is a self-hostable **NotebookLM CLI**
+> workflow that gives an AI agent a persistent, **token-efficient second brain**: a tiny local
+> memory loaded every session plus a large NotebookLM corpus queried on demand. In short, it's
+> practical **AI agent memory** that can **reduce agent token cost** for broad, multi-source
+> **research** by roughly **99%** versus a multi-agent web crawl.
+
 A tiny, self-hostable knowledge base that lets an AI agent **remember a lot while loading
-almost nothing** each session. It has two write stores and one deliberate non-store:
+almost nothing** each session. It's a **second brain for LLM agents** with two write stores and
+one deliberate non-store:
 
 - **Local memory** — a handful of short Markdown files, loaded into the agent's context on
   *every* run. Small on purpose (you pay for it in tokens each session).
@@ -147,6 +154,8 @@ The detailed manuals live in [`docs/`](docs/):
 - [Memory template](docs/MEMORY.template.md) — a ready-to-fill template for the local memory
   index loaded every session: frontmatter format, memory types, one-line-per-entry index and
   `[[cross-linking]]`.
+- [FAQ](docs/FAQ.md) — the expanded FAQ: what this is, how to run web research from the CLI,
+  how much it saves, headless/server use, and when *not* to reach for NotebookLM.
 
 ---
 
@@ -249,6 +258,52 @@ This is a knowledge base, and knowledge bases leak if you let them.
   profile that `notebooklm login` seeds are machine-local; don't commit or share them.
 - **Sweep before you publish.** grep the tree for emails, IPv4 addresses, token-shaped
   strings (`ghp_`, `sk-`, `AIza`, `xox`, `key`) and UUIDs before pushing anything public.
+
+---
+
+## FAQ
+
+Short answers below; the [expanded FAQ](docs/FAQ.md) has the detail.
+
+**What is the NotebookLM KB System?**
+It's a self-hostable NotebookLM CLI workflow that gives an AI (or LLM) agent a persistent
+"second brain." The agent loads a tiny local memory every session and queries a large
+NotebookLM corpus only when a task needs it — so it remembers a lot while paying almost no
+per-session token tax.
+
+**How do I do web research with NotebookLM from the CLI?**
+Run `~/.kb/research.sh <NOTEBOOK_ID> "<an extensive, context-rich question>" fast` (or `deep`).
+NotebookLM performs the search-and-ingest on Google's infrastructure and saves the results as
+sources in the notebook; the wrapper re-lists the sources to *verify* the import actually
+happened (it never trusts the exit code). You then read the result with `kb ask` or
+`kb source fulltext`.
+
+**How much can this save vs a multi-agent research workflow?**
+For broad, multi-source recon, roughly **99%**. A measured 52-agent fan-out cost about
+**1.9M output tokens**; the same discovery routed through NotebookLM costs the agent only a
+few thousand tokens to read the compact, cited result — because the crawl-and-summarize runs
+on Google's side, outside the agent's token budget.
+
+**Does it work headless / on a server?**
+Yes. After a one-time interactive `notebooklm login`, set `NOTEBOOKLM_HEADLESS_REAUTH=1` and
+deep research can refresh its own session without a visible browser window — suitable for
+scheduled or non-interactive runs on a server. `fast` mode needs no extra login.
+
+**What's the difference between local memory and a NotebookLM notebook here?**
+Local memory is a handful of short Markdown files loaded on *every* run (identity, hard rules,
+method corrections, work in progress) — keep it small, you pay for it each session. A notebook
+is the large reference corpus (procedures, command syntax, gotchas, stable design) that costs
+tokens only when you query it. One fact lives in exactly one place.
+
+**When should I NOT use NotebookLM research?**
+When you already know where a single fact lives — a direct lookup is cheaper and faster. Also
+remember answers are *faithful to the corpus, not verified truth* (grounding isn't
+fact-checking), and research is async with minute-scale latency. Use it as a pipeline for broad
+gathering, then have the agent verify the load-bearing claims.
+
+**Is this an official Google or NotebookLM product?**
+No. It's an independent, open-source (AGPL-3.0) workflow built on top of a `notebooklm` CLI.
+It isn't affiliated with, endorsed by, or supported by Google or NotebookLM.
 
 ---
 
