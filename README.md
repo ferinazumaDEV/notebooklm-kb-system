@@ -383,3 +383,5 @@ Licensed under the **GNU Affero General Public License v3.0 (AGPL-3.0)** — see
 Copyright (C) 2026 Fernando
 
 **What this means:** you may use, study, modify and share this software freely, but **if you distribute it — or run a modified version as a network service (SaaS) — you must release your complete corresponding source code under the same AGPL-3.0 terms.** It cannot be taken closed-source. This is deliberate: the project is public to be shared, not made proprietary.
+
+<!-- provenance-fingerprint: nbkb-ec948d2d85 (AGPL-3.0, github.com/ferinazuma/notebooklm-kb-system) -->
