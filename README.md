@@ -39,7 +39,8 @@ This system fixes both:
 - **Discovery is offloaded.** When you need broad, multi-source research, NotebookLM's
   **add-research** flow runs the search-and-ingest on Google's infrastructure. The agent
   then reads a compact, cited synthesis — a few thousand tokens — instead of unleashing a
-  swarm of sub-agents that each burn tokens crawling the web. (See §6 for the numbers.)
+  swarm of sub-agents that each burn tokens crawling the web. (See the token-savings
+  section for the numbers.)
 
 The result is a "second brain" that's cheap to carry, deep to query, and honest about what
 it doesn't know.
@@ -85,200 +86,90 @@ Three destinations, one routing decision, two query paths.
                          agent reads the compact result (~few-K tokens)
 ```
 
-- **INTERNAL** lives in `~/.kb/memory/` (see `MEMORY.template.md`).
+- **INTERNAL** lives in `~/.kb/memory/` (see [Memory template](docs/MEMORY.template.md)).
 - **EXTERNAL** lives in NotebookLM; a small `notebooks.json` maps friendly keys → ids.
 - **NONE** lives nowhere — it's verified against the system (`df`, `ip a`,
   `systemctl status`, the API) the moment you need it.
 
-The full rule, with worked examples, is in **`KNOWLEDGE-ROUTING.md`**.
+The full rule, with worked examples, is in
+[Knowledge routing](docs/KNOWLEDGE-ROUTING.md).
 
 ---
 
-## 3. Prerequisites and installation
+## Quick start
 
-You need **Python 3.9+**, `jq` (used by `research.sh`) and a Google account that can use
-NotebookLM.
-
-### 3.1 Create a virtualenv and install the CLI
-
-Keep the CLI and its browser automation isolated in a venv so they can't clash with the
-system Python.
-
-```bash
-mkdir -p ~/.kb
-python3 -m venv ~/.kb/venv
-source ~/.kb/venv/bin/activate      # do this in every shell that runs the CLI
-
-# The CLI, WITH the browser extra (the optional dependency group that enables the
-# browser-backed flows: interactive login, headless re-auth, and deep research).
-pip install "notebooklm[browser]"
-
-# Install the browser binary Playwright drives.
-playwright install chromium
-```
-
-> `pip install notebooklm` on its own gives you the bare CLI, but the `[browser]` extra is
-> mandatory for login and deep research. Install the extra now to avoid a confusing "works
-> for ask, fails for research" state later.
-
-### 3.2 Log in once (seed the reusable profile)
-
-```bash
-notebooklm login
-```
-
-This opens a browser once, you sign in interactively, and it **saves a reusable browser /
-session profile** on this machine. That stored profile is what lets later runs
-re-authenticate **headless** — with no visible window — which is what deep research needs.
-Do it once per machine.
-
-For non-interactive / scheduled runs, enable headless re-authentication so a long job can
-refresh its own session mid-run instead of dying:
-
-```bash
-export NOTEBOOKLM_HEADLESS_REAUTH=1   # put this in your shell profile or in research.sh
-```
-
-If a run later fails with an auth error, the stored session expired — just re-run
-`notebooklm login` once to re-seed it.
-
-### 3.3 Create notebooks and add file sources
-
-Create one notebook per **domain** (e.g. `infra`, `apps`, `ops`). Prefer a few broad
-notebooks over many tiny ones.
-
-```bash
-# Create a notebook; note the id it prints back.
-notebooklm notebook create "infra"
-#   -> created notebook <NOTEBOOK_ID>
-
-# Upload a local Markdown/text file as a SOURCE (what queries actually read).
-notebooklm source add <NOTEBOOK_ID> ~/.kb/build/infra__architecture.md
-
-# Confirm it ingested.
-notebooklm source list <NOTEBOOK_ID>     # wait until the source shows "ready"
-```
-
-Record the mapping so you never paste a raw UUID again:
-
-```bash
-# ~/.kb/notebooks.json   — friendly key -> notebook id
-{ "infra": "<NOTEBOOK_ID>", "apps": "<NOTEBOOK_ID>", "ops": "<NOTEBOOK_ID>" }
-```
-
-Copy `MEMORY.template.md` into place and fill in your own identity, projects, rules and
-notebook keys:
-
-```bash
-mkdir -p ~/.kb/memory
-cp MEMORY.template.md ~/.kb/memory/MEMORY.md
-cp KNOWLEDGE-ROUTING.md OPERATIONS.md RESEARCH_PROMPT_TEMPLATE.md ~/.kb/
-cp research.sh ~/.kb/ && chmod +x ~/.kb/research.sh
-```
+1. **Pick your terminal guide** in [Installation](#installation) below — or just run the automated installer.
+2. **Run the installer:** `bash install/install.sh` (Linux/macOS) or `install/install.ps1` (Windows/PowerShell). It builds the `~/.kb/` venv, installs the CLI, and detects your browser automatically.
+3. **Log in once:** `notebooklm login` — seeds a reusable, headless-capable session on this machine.
+4. **First research:** `~/.kb/research.sh <NOTEBOOK_ID> "<an extensive, context-rich question>" fast`.
 
 ---
 
-## 4. Daily use
+## Installation
 
-### 4.1 Query a notebook (the cheap, common operation)
+Two ways to install: an **automated script**, or a **step-by-step guide** for your terminal.
 
-```bash
-notebooklm ask <NOTEBOOK_ID> "<an extensive, context-rich question>"
-```
+### Automated scripts
 
-- **Ask long and specific.** NotebookLM answers a well-framed question far better than a
-  keyword. Say what you're doing, what you already know, and what you need out of it.
-- **Query *before* you act**, not once you're stuck — if a canonical procedure lives in a
-  notebook, read it first instead of reconstructing it from memory.
-- Reading is non-destructive; nothing you ask changes the corpus.
+- **Linux / macOS** → [`install/install.sh`](install/install.sh): `bash install/install.sh`
+- **Windows (PowerShell)** → [`install/install.ps1`](install/install.ps1)
 
-See **`RESEARCH_PROMPT_TEMPLATE.md`** for prompt patterns that stop NotebookLM from
-silently dropping parts of a multi-part question (numbered answers, a forced
-`NOT IN SOURCES` token, a trailing `GAPS` section).
+Both scripts create the isolated `~/.kb/` virtualenv, install `notebooklm[browser]`, install
+the browser binary Playwright drives, and lay down the config skeleton. They **auto-detect a
+browser you already have** (Chrome / Edge / Brave / Firefox) and drive that — **you don't need
+to install a specific browser** just for this.
 
-### 4.2 Run web research (grow the corpus)
+### Step-by-step guides
 
-Use the wrapper — it drives the research, **waits** for ingestion and **verifies** the
-sources actually landed (the raw CLI can exit 0 without having imported anything):
+Prefer to run each step yourself, or need to troubleshoot? Follow the guide for your terminal:
 
-```bash
-./research.sh <NOTEBOOK_ID> "<research question or topic>" fast   # quick, shallow sweep
-./research.sh <NOTEBOOK_ID> "<research question or topic>" deep   # broad, multi-source
-```
-
-- **fast** — a quick pass with fewer sources; good for a first look.
-- **deep** — a broad, multi-source pass; it exports `NOTEBOOKLM_HEADLESS_REAUTH=1` for you
-  so a long headless job can refresh its own auth. Needs the §3.2 login already seeded.
-- On success, the script prints a single integer on stdout: the number of sources added.
-  Diagnostics go to stderr. It exits non-zero if nothing landed.
-
-Then re-read the imported material with **fulltext**, not an artifact export:
-
-```bash
-notebooklm source list <NOTEBOOK_ID>                 # find the new source id
-notebooklm source fulltext <NOTEBOOK_ID> <SOURCE_ID> # the raw, usable text
-```
-
-### 4.3 The local memory + routing flow
-
-Whenever you learn something durable, **route it before you save it**:
-
-1. **Does it change on its own?** (disk, IPs, counters, tokens, versions) → **NONE.**
-   Verify it live; don't write it down.
-2. **Must the agent know it *before* acting, every session?** (identity, a hard rule, a
-   method correction, a pointer to current WIP) → **INTERNAL.** One line in `MEMORY.md`,
-   linked to the detail.
-3. **Everything else** — reference, procedure, command, gotcha, dead end, stable design →
-   **EXTERNAL.** Put it in the right notebook; leave at most a pointer in `MEMORY.md`.
-4. **Is it actually several facts?** → **split it** and route each piece.
-5. **Already stored?** → **don't duplicate.** One fact, one home.
-
-The canonical rule (with examples of how to split mixed learnings) is in
-**`KNOWLEDGE-ROUTING.md`**; the memory-file format is in **`MEMORY.template.md`**.
+- [Windows (PowerShell)](install/windows-powershell.md)
+- [Windows (CMD)](install/windows-cmd.md)
+- [Linux](install/linux.md)
+- [macOS](install/macos.md)
 
 ---
 
-## 5. Maintenance
+## Documentation
 
-### 5.1 Editing a notebook means re-uploading the source
+The detailed manuals live in [`docs/`](docs/):
 
-A NotebookLM notebook reasons over its **uploaded sources**, not a file on your disk.
-Editing your local **build-doc** changes nothing in the notebook until you replace the
-source. The safe sequence is **add-new → wait-ready → delete-old** (never delete first):
+- [Operations](docs/OPERATIONS.md) — the full runbook: architecture, read/write paths, the
+  add→wait→delete re-upload rule, deep-research headless auth, known gotchas, and a
+  maintenance checklist.
+- [Knowledge routing](docs/KNOWLEDGE-ROUTING.md) — the core 3-destination rule
+  (INTERNAL / EXTERNAL / NONE): what goes where, how to split mixed learnings, and the
+  one-fact-one-home rule, with a decision checklist.
+- [Research prompt template](docs/RESEARCH_PROMPT_TEMPLATE.md) — prompt patterns for both
+  operations: how to write specific add-research queries and how to harden `ask` prompts so
+  nothing gets silently dropped (numbered answers, a forced `NOT IN SOURCES` token, a
+  trailing `GAPS` section).
+- [Memory template](docs/MEMORY.template.md) — a ready-to-fill template for the local memory
+  index loaded every session: frontmatter format, memory types, one-line-per-entry index and
+  `[[cross-linking]]`.
 
-```bash
-# 1. Edit the build-doc locally.
-$EDITOR ~/.kb/build/<key>__<topic>.md
+---
 
-# 2. Upload the NEW version as a source.
-notebooklm source add <NOTEBOOK_ID> ~/.kb/build/<key>__<topic>.md
+## Project structure
 
-# 3. WAIT until the new source shows "ready" (an ingesting source can't answer).
-notebooklm source list <NOTEBOOK_ID>
-
-# 4. ONLY THEN delete the OLD source.
-notebooklm source delete <NOTEBOOK_ID> <OLD_SOURCE_ID>
 ```
-
-Why the order: **add before delete** means a failed upload leaves a harmless duplicate,
-not an empty notebook. **A notebook should never be left with 0 sources** — some backends
-reject queries or misbehave when empty. Treat "0 sources" as a broken state to escape
-immediately.
-
-### 5.2 Verify with a check
-
-After any write, list again and confirm exactly **one ready copy** of the topic:
-
-```bash
-notebooklm source list <NOTEBOOK_ID>   # exactly one ready copy per topic? good.
+notebooklm-kb-system/
+├── README.md                        # this hub — concept, install/doc links, token math, security
+├── research.sh                      # web-research wrapper: research.sh <NOTEBOOK_ID> "<query>" fast|deep
+├── LICENSE                          # AGPL-3.0
+├── install/
+│   ├── install.sh                   # automated installer (Linux / macOS)
+│   ├── install.ps1                  # automated installer (Windows / PowerShell)
+│   ├── windows-powershell.md        # manual guide — Windows PowerShell
+│   ├── windows-cmd.md               # manual guide — Windows Command Prompt
+│   ├── linux.md                     # manual guide — Linux (Ubuntu/Debian, bash)
+│   └── macos.md                     # manual guide — macOS (zsh)
+└── docs/
+    ├── OPERATIONS.md                # full operations runbook
+    ├── KNOWLEDGE-ROUTING.md         # the 3-destination routing rule
+    ├── RESEARCH_PROMPT_TEMPLATE.md  # add-research + ask() prompt patterns
+    └── MEMORY.template.md           # local-memory index template
 ```
-
-`research.sh` already has this verification built in for the research path: it snapshots
-the source count *before*, polls until nothing is still "preparing", then compares the
-*after* count — and fails loudly if nothing really imported. For your own manual edits, a
-small wrapper that lists the sources and greps for duplicates / non-ready states is a handy
-`check` script. The full runbook (with the dedup step and every gotcha) is in
-**`OPERATIONS.md`**.
 
 ---
 
@@ -334,9 +225,10 @@ NotebookLM  →  discovery + first-synthesis (cheap, faithful, gap-flagged)
 
 NotebookLM does the broad, cheap gathering; the agent spends its (now small) token budget
 on the part that really needs a mind — cross-checking the claims that hold up the decision
-against a second source and deciding what to do. See **`RESEARCH_PROMPT_TEMPLATE.md` §3**
-for exactly which jobs you should keep on the agent's side (rating sources, verifying
-truth, modeling scenarios, holding live state).
+against a second source and deciding what to do. See
+[Research prompt template §3](docs/RESEARCH_PROMPT_TEMPLATE.md) for exactly which jobs you
+should keep on the agent's side (rating sources, verifying truth, modeling scenarios,
+holding live state).
 
 ---
 
@@ -359,22 +251,6 @@ This is a knowledge base, and knowledge bases leak if you let them.
   strings (`ghp_`, `sk-`, `AIza`, `xox`, `key`) and UUIDs before pushing anything public.
 
 ---
-
-## Files in this kit
-
-| File | What it's for |
-|---|---|
-| **`README.md`** | This guide — what the system is, how to install it, use it daily, and why it saves tokens. |
-| **`KNOWLEDGE-ROUTING.md`** | The core 3-destination rule (INTERNAL / EXTERNAL / NONE): what goes where, how to split mixed learnings, and the one-fact-one-home rule, with a decision checklist. |
-| **`MEMORY.template.md`** | A ready-to-fill template for the local memory index — the file loaded every session. Frontmatter format, memory types, one-line-per-entry index and `[[cross-linking]]`. |
-| **`OPERATIONS.md`** | The full operations manual: architecture, read/write paths, the add→wait→delete re-upload rule, deep-research headless auth, known gotchas and a maintenance checklist. |
-| **`RESEARCH_PROMPT_TEMPLATE.md`** | Prompt-engineering cheat sheet for both operations: how to write specific add-research queries and how to harden `ask` prompts so nothing gets silently dropped. |
-| **`research.sh`** | The web research wrapper: `./research.sh <NOTEBOOK_ID> "<query>" fast\|deep`. Runs the research, waits for ingestion and verifies the sources really landed (prints the added count). |
-
----
-
-*Generic starter kit. Placeholders only — no private data. Adapt paths, keys and CLI names
-to your own install.*
 
 ## License
 
