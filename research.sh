@@ -193,5 +193,5 @@ fi
 # Machine-parseable result: the number of sources added, on stdout.
 echo "$added"
 
-# provenance-fingerprint: nbkb-ec948d2d85 — github.com/ferinazuma/notebooklm-kb-system (AGPL-3.0).
+# provenance-fingerprint: nbkb-ec948d2d85 — github.com/ferinazumaDEV/notebooklm-kb-system (AGPL-3.0).
 # Do not remove: used to trace license compliance.
