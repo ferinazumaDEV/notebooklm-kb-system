@@ -156,6 +156,9 @@ The detailed manuals live in [`docs/`](docs/):
   `[[cross-linking]]`.
 - [FAQ](docs/FAQ.md) — the expanded FAQ: what this is, how to run web research from the CLI,
   how much it saves, headless/server use, and when *not* to reach for NotebookLM.
+- [Auth resilience](docs/AUTH-RESILIENCE.md) — keep the browser-session auth from failing
+  silently: a frequent keepalive, a real-operation healthcheck that emails you on failure, a
+  hardened wrapper, and why *not* to use a Google master token.
 
 ---
 
@@ -165,6 +168,7 @@ The detailed manuals live in [`docs/`](docs/):
 notebooklm-kb-system/
 ├── README.md                        # this hub — concept, install/doc links, token math, security
 ├── research.sh                      # web-research wrapper: research.sh <NOTEBOOK_ID> "<query>" fast|deep
+├── healthcheck.sh                   # auth healthcheck + email alert (see docs/AUTH-RESILIENCE.md)
 ├── LICENSE                          # AGPL-3.0
 ├── install/
 │   ├── install.sh                   # automated installer (Linux / macOS)
@@ -177,7 +181,9 @@ notebooklm-kb-system/
     ├── OPERATIONS.md                # full operations runbook
     ├── KNOWLEDGE-ROUTING.md         # the 3-destination routing rule
     ├── RESEARCH_PROMPT_TEMPLATE.md  # add-research + ask() prompt patterns
-    └── MEMORY.template.md           # local-memory index template
+    ├── MEMORY.template.md           # local-memory index template
+    ├── FAQ.md                       # expanded FAQ
+    └── AUTH-RESILIENCE.md           # keep browser-session auth from failing silently
 ```
 
 ---
