@@ -157,8 +157,10 @@ The detailed manuals live in [`docs/`](docs/):
 - [FAQ](docs/FAQ.md) — the expanded FAQ: what this is, how to run web research from the CLI,
   how much it saves, headless/server use, and when *not* to reach for NotebookLM.
 - [Auth resilience](docs/AUTH-RESILIENCE.md) — keep the browser-session auth from failing
-  silently: a frequent keepalive, a real-operation healthcheck that emails you on failure, a
-  hardened wrapper, and why *not* to use a Google master token.
+  silently. Why a frequent keepalive alone **doesn't** stop the multi-day death (device-bound
+  tokens), the real prevention (exercise the profile with a real browser / a host-local device
+  key), a real-operation healthcheck that emails you, a hardened wrapper, a local degraded mode,
+  and why *not* to use a Google master token.
 
 ---
 

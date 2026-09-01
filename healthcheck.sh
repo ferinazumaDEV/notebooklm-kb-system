@@ -8,17 +8,21 @@
 #
 # Part of the "local memory + NotebookLM notebooks" second-brain starter kit.
 #
-# THE PROBLEM. NotebookLM auth is a browser session (Google cookies). Two ways it rots:
-#   1. The session cookie (`__Secure-1PSIDTS`) rotates on a window of minutes-to-days. A
-#      once-a-day keepalive can cross that window and the session dies server-side.
-#   2. When it dies, a naive cron just logs a warning nobody reads — so you discover it
-#      days later, the first time an agent actually needs the notebook.
+# THE PROBLEM. NotebookLM auth is a browser session (Google cookies). It rots on TWO clocks:
+#   1. The short cookie (`__Secure-1PSIDTS`) rotates in minutes-to-hours; too-infrequent a
+#      keepalive crosses that window and the session dies. A frequent `auth refresh` fixes THIS.
+#   2. The device-bound tokens (Google DBSC + the refresh-token family) age out over DAYS and
+#      can only be renewed by a REAL browser exercising the profile — a POST keepalive can't, so
+#      the session still dies server-side even under a perfect 15-min keepalive. A dead session
+#      is then discovered days later by a naive cron that just logs a warning nobody reads.
 #   And `doctor` / `auth check` LIE: they report "valid" (cookies present) while every real
 #   RPC bounces to accounts.google.com. Only a real operation detects the outage.
+#   (Full model + the warm-profile / host-local-device-key prevention: docs/AUTH-RESILIENCE.md.)
 #
-# THE FIX (this script + a frequent keepalive; see docs/AUTH-RESILIENCE.md):
+# THE FIX (this script + a frequent keepalive + a warm-profile pass; see docs/AUTH-RESILIENCE.md):
 #   - Probe with a REAL, cheap operation (`source list` on a small notebook), not `doctor`.
-#   - If auth is down: try an unattended re-auth (keepalive + headless re-mint).
+#   - If auth is down: try an unattended re-auth cascade (keepalive -> headless warm-profile
+#     re-mint), verifying with a real op after each step.
 #   - If it's still down: EMAIL the operator with the exact recovery steps, once per
 #     cooldown window (so a multi-day outage is a single early alert, not silence).
 #   - Clears the alert stamp on recovery so the next outage alerts immediately.
