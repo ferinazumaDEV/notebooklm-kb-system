@@ -318,9 +318,9 @@ notebooklm-py 0.8.2. It isn't affiliated with, endorsed by, or supported by Goog
 
 ---
 
-## Part of the ferinazumaDEV ecosystem
+## Part of a wider set of open tools
 
-This is one project in a wider body of open tools by ferinazumaDEV. It's the practical companion
+This is one project in a wider body of open tools by Fernando Aporta Franco. It's the practical companion
 to maintaining a **citable, machine-readable corpus**: a knowledge system that keeps an agent's
 reference material structured, queryable, and cheap to pull — the same discipline that Generative
 Engine Optimization (GEO) asks of any content you want AI answer engines to find and quote.
@@ -338,7 +338,7 @@ By [ferinazumaDEV](https://github.com/ferinazumaDEV).
 
 Licensed under the **GNU Affero General Public License v3.0 (AGPL-3.0)** — see [LICENSE](LICENSE).
 
-Copyright (C) 2026 Fernando
+Copyright (C) 2026 Fernando Aporta Franco
 
 **What this means:** you may use, study, modify and share this software freely, but **if you distribute it — or run a modified version as a network service (SaaS) — you must release your complete corresponding source code under the same AGPL-3.0 terms.** It cannot be taken closed-source. This is deliberate: the project is public to be shared, not made proprietary.
 

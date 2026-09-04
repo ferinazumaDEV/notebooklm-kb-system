@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Copyright (C) 2026 Fernando — Licensed under AGPL-3.0 (see LICENSE).
+# Copyright (C) 2026 Fernando Aporta Franco — Licensed under AGPL-3.0 (see LICENSE).
 # Free software with ABSOLUTELY NO WARRANTY; redistribute under the AGPL-3.0 terms.
 #
 # research.sh — feeds a NotebookLM notebook with fresh web research and then PROVES it was saved.
