@@ -174,6 +174,9 @@ notebooklm-kb-system/
 ├── research.sh                      # web-research wrapper: research.sh <NOTEBOOK_ID> "<query>" fast|deep
 ├── healthcheck.sh                   # auth healthcheck + email alert (see docs/AUTH-RESILIENCE.md)
 ├── LICENSE                          # AGPL-3.0
+├── tests/
+│   ├── run.sh                       # bash tests/run.sh — behaviour tests for both scripts (see below)
+│   └── bin/notebooklm               # strict mock of the notebooklm-py 0.8.2 CLI surface the scripts use
 ├── install/
 │   ├── install.sh                   # automated installer (Linux / macOS)
 │   ├── install.ps1                  # automated installer (Windows / PowerShell)
@@ -189,6 +192,13 @@ notebooklm-kb-system/
     ├── FAQ.md                       # expanded FAQ
     └── AUTH-RESILIENCE.md           # keep browser-session auth from failing silently
 ```
+
+**Tests:** `bash tests/run.sh` (needs `bash` + `jq`, no network) drives `research.sh` and
+`healthcheck.sh` against a strict mock of the CLI — count-before/after, polling, timeouts,
+the alert/cooldown/re-auth cascade — and checks the scripts call the CLI in the shape
+notebooklm-py 0.8.2 accepts. Point `NOTEBOOKLM_REAL_CLI` at a notebooklm-py install (or have
+`notebooklm` on `PATH`) and it also runs the same commands against the real CLI with an empty
+`HOME`: they must fail on auth (rc 1), never on argument parsing (rc 2).
 
 ---
 
