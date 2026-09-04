@@ -5,7 +5,7 @@
 .DESCRIPTION
     Automates the manual flow in install/windows-powershell.md:
 
-      1. Finds a suitable Python (3.9+; 3.11+ recommended).
+      1. Finds a suitable Python (3.10+; 3.11+ recommended).
       2. Creates an isolated virtualenv under the KB root (default: $HOME\.kb\venv).
       3. Installs the CLI with its browser extras:  pip install "notebooklm-py[browser,cookies]".
       4. DETECTS which browser you have (Chrome / Edge / Brave / Firefox) via the
@@ -154,7 +154,7 @@ function Find-Browser {
 
 # ---------------------------------------------------------------------------
 # Locate a usable Python. Prefer the Windows launcher (`py -3`, which selects the
-# newest installed 3.x), then `python`, then `python3`. Requires 3.9+.
+# newest installed 3.x), then `python`, then `python3`. Requires 3.10+.
 # Returns an object with the exe + any leading args (e.g. -3) and the version.
 # ---------------------------------------------------------------------------
 function Resolve-Python {
@@ -173,7 +173,7 @@ function Resolve-Python {
         $verStr = ("$out").Trim()
         $ver = $null
         if (-not [version]::TryParse($verStr, [ref]$ver)) { continue }
-        if ($ver -ge [version]'3.9') {
+        if ($ver -ge [version]'3.10') {
             return [pscustomobject]@{ Exe = $c.Exe; Pre = @($c.Pre); Version = $ver }
         }
     }
@@ -201,7 +201,7 @@ $playwrightExe = Join-Path $venvScripts 'playwright.exe'
 # ===========================================================================
 # 1. PYTHON
 # ===========================================================================
-Write-Step "Checking Python (need 3.9+, 3.11+ recommended)"
+Write-Step "Checking Python (need 3.10+, 3.11+ recommended)"
 $py = Resolve-Python
 if (-not $py) {
     Write-Warn2 "No suitable Python found on PATH."
@@ -209,7 +209,7 @@ if (-not $py) {
     Write-Info  "    winget install --id Python.Python.3.11 -e --source winget"
     Write-Info  "  or download from https://www.python.org/downloads/windows/"
     Write-Info  "  (tick 'Add python.exe to PATH' in the installer, then open a NEW window)."
-    throw "Python 3.9+ is required."
+    throw "Python 3.10+ is required."
 }
 Write-Ok ("Found Python {0} via '{1} {2}'" -f $py.Version, $py.Exe, ($py.Pre -join ' ')).Trim()
 if ($py.Version -lt [version]'3.11') {

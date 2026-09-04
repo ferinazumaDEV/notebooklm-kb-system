@@ -9,7 +9,7 @@
 # Part of the "local memory + NotebookLM notebooks" second-brain starter kit.
 #
 # What it does, in order:
-#   1. Checks you have a usable Python (3.9+).
+#   1. Checks you have a usable Python (3.10+).
 #   2. Creates an isolated virtualenv (default: ~/.kb-venv; --local uses ./.venv) and
 #      activates it, so the CLI + its browser automation can't clash with system Python.
 #   3. Installs the CLI WITH its browser extras:  pip install "notebooklm-py[browser,cookies]".
@@ -39,7 +39,7 @@
 #                          chrome | chromium | msedge   (uses --browser)
 #                          firefox | brave              (uses --browser-cookies)
 #
-# Requirements: bash, a Python 3.9+ interpreter, and network access for pip.
+# Requirements: bash, a Python 3.10+ interpreter, and network access for pip.
 # ---------------------------------------------------------------------------------------
 
 set -euo pipefail
@@ -107,11 +107,11 @@ IS_MACOS=0
 step "1/6  Checking Python"
 
 command -v "$PYTHON_BIN" >/dev/null 2>&1 \
-  || die "'$PYTHON_BIN' not found. Install Python 3.9+ (macOS: 'brew install python'; Debian/Ubuntu: 'sudo apt install python3 python3-venv')."
+  || die "'$PYTHON_BIN' not found. Install Python 3.10+ (macOS: 'brew install python'; Debian/Ubuntu: 'sudo apt install python3 python3-venv')."
 
-# Require 3.9+. The interpreter itself is the most reliable version oracle.
-if ! "$PYTHON_BIN" -c 'import sys; raise SystemExit(0 if sys.version_info[:2] >= (3, 9) else 1)'; then
-  die "Python 3.9+ is required (found $("$PYTHON_BIN" -V 2>&1)). Install a newer Python or set PYTHON=/path/to/python3.x"
+# Require 3.10+ (notebooklm-py declares Requires-Python >=3.10). The interpreter itself is the most reliable version oracle.
+if ! "$PYTHON_BIN" -c 'import sys; raise SystemExit(0 if sys.version_info[:2] >= (3, 10) else 1)'; then
+  die "Python 3.10+ is required (found $("$PYTHON_BIN" -V 2>&1)). Install a newer Python or set PYTHON=/path/to/python3.x"
 fi
 ok "Using $("$PYTHON_BIN" -V 2>&1) at $(command -v "$PYTHON_BIN")"
 

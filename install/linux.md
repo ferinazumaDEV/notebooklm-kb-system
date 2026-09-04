@@ -35,7 +35,7 @@ notebook and you can omit `-n`.
 
 ## 1. Install prerequisites (apt)
 
-You need Python 3.9+ with the **venv** and **pip** modules (Debian/Ubuntu split these into
+You need Python 3.10+ with the **venv** and **pip** modules (Debian/Ubuntu split these into
 separate packages), plus `jq` (used by `research.sh` to parse the CLI's JSON).
 
 ```bash
@@ -46,7 +46,7 @@ sudo apt-get install -y python3 python3-venv python3-pip jq
 Confirm the versions:
 
 ```bash
-python3 --version        # -> Python 3.9 or newer
+python3 --version        # -> Python 3.10 or newer
 jq --version             # -> jq-1.x
 ```
 

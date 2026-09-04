@@ -19,7 +19,7 @@ notebook and you can omit `-n`.
 
 ## What you'll do
 
-1. Install Python 3.11+
+1. Install Python 3.10+ (3.11 recommended)
 2. Create and activate a virtualenv (PowerShell syntax)
 3. Install the CLI: `pip install "notebooklm-py[browser,cookies]"`
 4. Install a Playwright browser — **only if you have no system browser** (§4)
@@ -30,7 +30,7 @@ notebook and you can omit `-n`.
 
 ---
 
-## 1. Install Python 3.11+
+## 1. Install Python 3.10+
 
 Check whether a suitable Python is already present (the Windows launcher is `py`):
 
@@ -40,7 +40,7 @@ py --version
 python --version
 ```
 
-If it prints **3.11** or newer, skip ahead to §2. Otherwise install it.
+If it prints **3.10** or newer, skip ahead to §2 (3.11+ recommended). Otherwise install it.
 
 **Option A — winget (recommended, ships with Windows 10/11):**
 

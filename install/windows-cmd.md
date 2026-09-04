@@ -25,7 +25,7 @@ in `%USERPROFILE%\.kb` — the Windows equivalent of the `~/.kb/` used elsewhere
 ## 0. Prerequisites
 
 - **Windows 10 or 11** with **Command Prompt** (`cmd.exe`).
-- **Python 3.9+**. If you don't have it, install from
+- **Python 3.10+**. If you don't have it, install from
   [python.org](https://www.python.org/downloads/windows/) and **tick "Add python.exe to
   PATH"** in the installer. Windows ships the `py` launcher with it, which this guide uses.
 - A **Google account** that can open NotebookLM.

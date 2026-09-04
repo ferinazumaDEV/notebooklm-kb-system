@@ -17,7 +17,7 @@ notebook and you can omit `-n`.
 
 ## What you'll do
 
-1. Install Python 3.11+ (Homebrew or python.org)
+1. Install Python 3.10+ (3.11 recommended; Homebrew or python.org)
 2. Create and activate a virtualenv (zsh)
 3. Install the CLI: `pip install "notebooklm-py[browser,cookies]"`
 4. Detect your browser and run `notebooklm login` with the right flag
@@ -27,12 +27,12 @@ notebook and you can omit `-n`.
 
 ---
 
-## 1. Install Python 3.11+
+## 1. Install Python 3.10+
 
 Check what you already have:
 
 ```zsh
-python3 --version      # 3.11 or newer? skip to §2
+python3 --version      # 3.10 or newer? skip to §2 (3.11+ recommended)
 ```
 
 **Option A — Homebrew (recommended):**

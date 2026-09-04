@@ -106,7 +106,7 @@ The full rule, with worked examples, is in
 ## Quick start
 
 1. **Pick your terminal guide** in [Installation](#installation) below — or just run the automated installer.
-2. **Run the installer:** `bash install/install.sh` (Linux/macOS) or `install/install.ps1` (Windows/PowerShell). It builds the `~/.kb/` venv, installs the CLI, and detects your browser automatically.
+2. **Run the installer** (needs Python 3.10+): `bash install/install.sh` (Linux/macOS) or `install/install.ps1` (Windows/PowerShell). It builds the `~/.kb/` venv, installs the CLI, and detects your browser automatically.
 3. **Log in once:** `notebooklm login` — seeds a reusable, headless-capable session on this machine.
 4. **First research:** `~/.kb/research.sh <NOTEBOOK_ID> "<an extensive, context-rich question>" fast`.
 
