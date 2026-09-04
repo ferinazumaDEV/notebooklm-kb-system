@@ -13,8 +13,10 @@ This document is the operating manual for maintaining that system: how the piece
 how to read from a notebook, how to write to one correctly, how to run research on the
 web, and the traps that will bite you if you skip a step.
 
-All commands below assume a CLI wrapper on your `PATH`. Adjust names/paths to your
-installation. Placeholders like `<NOTEBOOK_ID>`, `<YOUR_EMAIL>`, `<KEY>` and `~/.kb/`
+All commands below assume a CLI wrapper on your `PATH`: `kb`/`nb` stand for a tiny wrapper
+you write that maps a key to a notebook id via `notebooks.json` and calls
+`notebooklm ... -n <NOTEBOOK_ID>`; it is not included in this repo. Adjust names/paths to
+your installation. Placeholders like `<NOTEBOOK_ID>`, `<YOUR_EMAIL>`, `<KEY>` and `~/.kb/`
 stand for your own values.
 
 ---
@@ -166,10 +168,8 @@ integrate it into a notebook — useful for topics that move faster than your bu
 this through the research helper rather than by hand:
 
 ```bash
-~/.kb/research.sh "<research question or topic>"
-# optional flags the script forwards, e.g.:
-~/.kb/research.sh --mode fast "<topic>"
-~/.kb/research.sh --mode deep --into <KEY> "<topic>"
+~/.kb/research.sh <NOTEBOOK_ID> "<research question or topic>" fast
+~/.kb/research.sh <NOTEBOOK_ID> "<research question or topic>" deep
 ```
 
 There are two modes:
@@ -179,9 +179,9 @@ There are two modes:
 - **deep** — broader, multi-source research. Requires the headless-reauth setup
   below (see §5) because it drives a real browser session.
 
-`research.sh` wraps the underlying tool, applies your defaults, and (when `--into` is given)
-hands the results to a notebook. Keep your settings in the script so the caller
-doesn't have to remember flags.
+`research.sh` wraps the underlying tool and applies your defaults. It takes the notebook id
+directly — map a key to its id yourself via `notebooks.json`. Keep your settings in the
+script so the caller doesn't have to remember flags.
 
 ### Reading research results — `source fulltext`, not `artifact export`
 
@@ -274,8 +274,8 @@ kb source list <KEY>                             # wait until new one is ready
 kb source delete <KEY> <OLD_SOURCE_ID>           # remove stale source
 
 # RESEARCH
-~/.kb/research.sh "<topic>"                       # fast (~10 source cap)
-~/.kb/research.sh --mode deep --into <KEY> "<topic>"   # deep (needs §5)
+~/.kb/research.sh <NOTEBOOK_ID> "<topic>" fast   # fast
+~/.kb/research.sh <NOTEBOOK_ID> "<topic>" deep   # deep (needs §5)
 
 # ONE-TIME DEEP SETUP
 pip install "notebooklm-py[browser,cookies]"

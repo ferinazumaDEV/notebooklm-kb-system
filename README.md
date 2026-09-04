@@ -121,10 +121,12 @@ Two ways to install: an **automated script**, or a **step-by-step guide** for yo
 - **Linux / macOS** → [`install/install.sh`](install/install.sh): `bash install/install.sh`
 - **Windows (PowerShell)** → [`install/install.ps1`](install/install.ps1)
 
-Both scripts create the isolated `~/.kb/venv` virtualenv (Windows: `$HOME\.kb\venv`), install `notebooklm-py[browser,cookies]`, install
-the browser binary Playwright drives, and lay down the config skeleton. They **auto-detect a
-browser you already have** (Chrome / Edge / Brave / Firefox) and drive that — **you don't need
-to install a specific browser** just for this.
+Both scripts create the virtualenv (`~/.kb/venv`, Windows `$HOME\.kb\venv`), install the CLI
+with its browser extras (`notebooklm-py[browser,cookies]`), and **detect a browser you already
+have** (Chrome / Chromium / Edge / Brave / Firefox); only if none is found do they download
+Playwright's Chromium. They do not create the `~/.kb/` config files — the printed next steps
+show how. On a fresh Linux server also run `sudo ~/.kb/venv/bin/playwright install-deps chromium`
+([install/linux.md §4](install/linux.md)).
 
 ### Step-by-step guides
 
@@ -283,8 +285,8 @@ per-session token tax.
 Run `~/.kb/research.sh <NOTEBOOK_ID> "<an extensive, context-rich question>" fast` (or `deep`).
 NotebookLM performs the search-and-ingest on Google's infrastructure and saves the results as
 sources in the notebook; the wrapper re-lists the sources to *verify* the import actually
-happened (it never trusts the exit code). You then read the result with `kb ask` or
-`kb source fulltext`.
+happened (it never trusts the exit code). You then read the result with
+`notebooklm ask -n <NOTEBOOK_ID> "<question>"` or `notebooklm source fulltext -n <NOTEBOOK_ID> <SOURCE_ID>`.
 
 **How much can this save vs a multi-agent research workflow?**
 For broad, multi-source recon, roughly **99%**. A measured 52-agent fan-out cost about

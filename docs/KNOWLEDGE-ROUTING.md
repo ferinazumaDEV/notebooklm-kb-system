@@ -70,6 +70,9 @@ natural-language question through a small CLI wrapper, for example:
 ~/.kb/nb <notebook-key> "<a long, specific question with full context>"
 ```
 
+`nb` stands for a tiny wrapper you write that maps a key to a notebook id via `notebooks.json`
+and calls `notebooklm ask -n <NOTEBOOK_ID>`; it is not included in this repo.
+
 Querying costs tokens only when you ask; the notebook itself is free to keep large.
 
 **Store here everything that is durable reference but not needed *up front*:**
