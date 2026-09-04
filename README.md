@@ -323,7 +323,7 @@ reference material structured, queryable, and cheap to pull — the same discipl
 Engine Optimization (GEO) asks of any content you want AI answer engines to find and quote.
 
 - [The GEO Handbook](https://github.com/ferinazumaDEV/generative-engine-optimization-handbook) — the open reference on getting content cited by AI answer engines (ChatGPT, Perplexity, Google AI Overviews, Gemini, Copilot).
-- [structllm](https://github.com/ferinazumaDEV/structllm) — reliable structured output from any LLM: schema-validated JSON with tolerant repair and retries, for turning model answers into machine-readable data.
+- [typedout](https://github.com/ferinazumaDEV/typedout) — reliable structured output from any LLM: schema-validated JSON with tolerant repair and retries, for turning model answers into machine-readable data.
 - [politeclient](https://github.com/ferinazumaDEV/politeclient) — a polite, bulletproof HTTP client for Python (retries, per-host rate-limiting, caching, pagination) for the fetch-and-ingest side of building a corpus.
 - Hub & writing: [zentimes.es](https://zentimes.es).
 
