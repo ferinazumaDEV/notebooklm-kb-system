@@ -174,8 +174,9 @@ this through the research helper rather than by hand:
 
 There are two modes:
 
-- **fast** — a quick, shallow gather. No extra login. **Capped at roughly ~10
-  sources** — good for a first sweep, not for exhaustive coverage.
+- **fast** — a quick, shallow gather. No extra login.
+  **Capped at roughly ~10 sources** (observed, needs-verification) — good for a first sweep,
+  not for exhaustive coverage.
 - **deep** — broader, multi-source research. Requires the headless-reauth setup
   below (see §5) because it drives a real browser session.
 
@@ -234,8 +235,9 @@ re-run `notebooklm login` once (interactively) to reseed it, and carry on.
 
 ## 6. Known gotchas
 
-- **Fast research is capped at ~10 sources.** It's a first sweep, not full coverage. If
-  you need breadth, use deep — and expect to run several passes and deduplicate.
+- **Fast research is capped at ~10 sources** (observed, needs-verification). It's a first
+  sweep, not full coverage. If you need breadth, use deep — and expect to run several passes
+  and deduplicate.
 - **Deep research needs the headless-reauth setup (§5).** Without the browser extra,
   a seeded `notebooklm login`, and `NOTEBOOKLM_HEADLESS_REAUTH=1`, deep runs fail to
   authenticate. This is the most common "it worked yesterday" failure.
@@ -274,7 +276,7 @@ kb source list <KEY>                             # wait until new one is ready
 kb source delete <KEY> <OLD_SOURCE_ID>           # remove stale source
 
 # RESEARCH
-~/.kb/research.sh <NOTEBOOK_ID> "<topic>" fast   # fast
+~/.kb/research.sh <NOTEBOOK_ID> "<topic>" fast   # ~10-source cap (observed, needs-verification)
 ~/.kb/research.sh <NOTEBOOK_ID> "<topic>" deep   # deep (needs §5)
 
 # ONE-TIME DEEP SETUP

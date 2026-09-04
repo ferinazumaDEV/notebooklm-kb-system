@@ -60,8 +60,9 @@ keyword — include what you're doing, what you already know, and what you need 
 
 ## What's the difference between `fast` and `deep` research?
 
-- **fast** — a quick, shallow sweep. No extra login needed. Capped at roughly **~10 sources** —
-  good for a first pass, not exhaustive coverage.
+- **fast** — a quick, shallow sweep. No extra login needed.
+  Capped at roughly **~10 sources** (observed, needs-verification) — good for a first pass, not
+  exhaustive coverage.
 - **deep** — a broader, multi-source pass. It drives a real browser session, so it needs the
   one-time headless re-auth setup below. `research.sh deep` also exports
   `NOTEBOOKLM_HEADLESS_REAUTH=1` for you so a long-running job can refresh its own auth
@@ -147,7 +148,9 @@ with worked examples is in [Knowledge routing](KNOWLEDGE-ROUTING.md).
 ## Is this an official Google or NotebookLM product?
 
 No. It's an independent, open-source project (AGPL-3.0) that builds a memory-and-research
-workflow on top of a `notebooklm` CLI. It is not affiliated with, endorsed by, or supported by
+workflow on top of the unofficial `notebooklm-py` CLI by Teng Lin
+(<https://github.com/teng-lin/notebooklm-py>, MIT); tested with notebooklm-py 0.8.2. It is not
+affiliated with, endorsed by, or supported by
 Google or NotebookLM. NotebookLM is a product of Google; this repo is a separate community tool.
 
 ## What do I need to install it?

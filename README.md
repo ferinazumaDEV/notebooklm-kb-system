@@ -312,8 +312,9 @@ fact-checking), and research is async with minute-scale latency. Use it as a pip
 gathering, then have the agent verify the load-bearing claims.
 
 **Is this an official Google or NotebookLM product?**
-No. It's an independent, open-source (AGPL-3.0) workflow built on top of a `notebooklm` CLI.
-It isn't affiliated with, endorsed by, or supported by Google or NotebookLM.
+No. It's an independent, open-source (AGPL-3.0) workflow built on top of the unofficial
+`notebooklm-py` CLI by Teng Lin (<https://github.com/teng-lin/notebooklm-py>, MIT); tested with
+notebooklm-py 0.8.2. It isn't affiliated with, endorsed by, or supported by Google or NotebookLM.
 
 ---
 
