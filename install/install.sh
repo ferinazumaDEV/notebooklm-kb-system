@@ -10,7 +10,7 @@
 #
 # What it does, in order:
 #   1. Checks you have a usable Python (3.10+).
-#   2. Creates an isolated virtualenv (default: ~/.kb-venv; --local uses ./.venv) and
+#   2. Creates an isolated virtualenv (default: ~/.kb/venv; --local uses ./.venv) and
 #      activates it, so the CLI + its browser automation can't clash with system Python.
 #   3. Installs the CLI WITH its browser extras:  pip install "notebooklm-py[browser,cookies]".
 #   4. DETECTS which browser you have and picks the correct login flag:
@@ -27,7 +27,7 @@
 # Usage:
 #   ./install.sh [--local] [--force-login] [--upgrade] [-h|--help]
 #
-#   --local         Put the venv at ./.venv (in the current directory) instead of ~/.kb-venv.
+#   --local         Put the venv at ./.venv (in the current directory) instead of ~/.kb/venv.
 #   --force-login   Re-run `notebooklm login` even if the stored session still works.
 #   --upgrade       Pass --upgrade to pip so the CLI is bumped to the newest version.
 #   -h, --help      Show this help and exit.
@@ -64,7 +64,7 @@ REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 # ---- defaults / flag parsing ----------------------------------------------------------
 PYTHON_BIN="${PYTHON:-python3}"
-VENV_DIR="${KB_VENV:-$HOME/.kb-venv}"   # default install location for the venv
+VENV_DIR="${KB_VENV:-$HOME/.kb/venv}"   # default install location for the venv
 FORCE_LOGIN=0
 PIP_UPGRADE=()                          # becomes (--upgrade) when --upgrade is passed
 
@@ -77,7 +77,7 @@ install.sh — set up the NotebookLM KB System on Linux / macOS.
 Usage:
   ./install.sh [--local] [--force-login] [--upgrade] [-h|--help]
 
-  --local         Put the venv at ./.venv instead of ~/.kb-venv.
+  --local         Put the venv at ./.venv instead of ~/.kb/venv.
   --force-login   Re-run `notebooklm login` even if the session still works.
   --upgrade       Bump the CLI to the newest version (pip --upgrade).
   -h, --help      Show this help.
