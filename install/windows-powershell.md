@@ -236,7 +236,7 @@ Confirm auth actually works by hitting the service — listing your notebooks is
 non-destructive:
 
 ```powershell
-notebooklm notebook list
+notebooklm list
 ```
 
 If that returns without an auth error, you're set. (If your build names the verb
@@ -375,7 +375,7 @@ notebooklm source fulltext <NOTEBOOK_ID> <SOURCE_ID>    # the raw, usable text
 - **`research.sh: command not found` or `jq: not found`** — you're in PowerShell (bash
   only) or `jq` isn't installed. Use §8.1 (Git Bash/WSL + `winget install jqlang.jq`) or
   switch to the direct-CLI path in §8.2.
-- **Research seems to do nothing** — confirm auth (`notebooklm notebook list`), then
+- **Research seems to do nothing** — confirm auth (`notebooklm list`), then
   re-list sources; the async import can take minutes. `research.sh` waits and verifies for
   you; in PowerShell, poll `source list` until the new source is `ready`.
 
@@ -396,7 +396,7 @@ notebooklm login --browser msedge     # or --browser chrome | chromium | --brows
 & "$HOME\.kb\venv\Scripts\Activate.ps1"
 
 # Daily
-notebooklm notebook list
+notebooklm list
 notebooklm ask <NOTEBOOK_ID> "<long, contextual question>"
 notebooklm source add <NOTEBOOK_ID> "$HOME\.kb\build\<key>__<topic>.md"
 notebooklm source list <NOTEBOOK_ID>

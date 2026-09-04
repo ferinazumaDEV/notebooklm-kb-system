@@ -18,7 +18,7 @@
 #        - only Firefox / Brave      ->  notebooklm login --browser-cookies firefox|brave
 #        - none of the above         ->  playwright install chromium, then --browser chromium
 #   5. Runs the login (skipped if you're already authenticated, unless --force-login).
-#   6. VERIFIES auth with a real, non-destructive op (notebooklm notebook list).
+#   6. VERIFIES auth with a real, non-destructive op (notebooklm list).
 #   7. Prints the next steps (create a notebook, add a source, run research).
 #
 # It is IDEMPOTENT: an existing venv is reused, pip re-runs are no-ops when satisfied, and
@@ -240,7 +240,7 @@ fi
 step "5/6  Authenticating"
 
 # is_authed: true when a real, non-destructive op succeeds — proof the session is valid.
-is_authed() { notebooklm notebook list >/dev/null 2>&1; }
+is_authed() { notebooklm list >/dev/null 2>&1; }
 
 if [ "$FORCE_LOGIN" = "0" ] && is_authed; then
   ok "Already authenticated (a stored session is valid) — skipping login. Use --force-login to redo it."
@@ -273,7 +273,7 @@ fi
 step "6/6  Verifying"
 
 if is_authed; then
-  ok "Auth verified — 'notebooklm notebook list' succeeded."
+  ok "Auth verified — 'notebooklm list' succeeded."
 else
   die "Auth check failed after login. Re-run this script (or 'notebooklm login ${LOGIN_FLAGS[*]}') and complete the sign-in."
 fi

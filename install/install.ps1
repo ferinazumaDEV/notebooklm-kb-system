@@ -15,7 +15,7 @@
              Brave / Firefox    -> notebooklm login --browser-cookies brave|firefox
              none of the above  -> playwright install chromium, then --browser chromium
       5. Runs notebooklm login to seed the reusable session profile.
-      6. Verifies auth with a real, non-destructive call (notebooklm notebook list).
+      6. Verifies auth with a real, non-destructive call (notebooklm list).
       7. Prints the next steps (create a notebook, add a source, run research).
 
     The script never activates the venv (which would trip PowerShell's execution
@@ -390,9 +390,9 @@ if ($EnableHeadlessReauth) {
 # 8. VERIFY WITH A REAL OPERATION
 # ===========================================================================
 if (-not $SkipLogin) {
-    Write-Step "Verifying auth (notebooklm notebook list)"
+    Write-Step "Verifying auth (notebooklm list)"
     try {
-        Invoke-Native -Exe $notebooklmExe -Arguments @('notebook', 'list') -What "notebooklm notebook list"
+        Invoke-Native -Exe $notebooklmExe -Arguments @('list') -What "notebooklm list"
         Write-Ok "Auth works — the CLI reached NotebookLM."
     }
     catch {

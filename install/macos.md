@@ -179,7 +179,7 @@ run `add-research --deep` by hand.
 Confirm auth actually works by hitting the service — listing notebooks is non-destructive:
 
 ```zsh
-notebooklm notebook list
+notebooklm list
 ```
 
 If that returns without an auth error, you're set.
@@ -275,7 +275,7 @@ notebooklm source fulltext <NOTEBOOK_ID> <SOURCE_ID> # the raw, usable text
 - **Auth error on a later run** — the stored session expired; re-run the `notebooklm login`
   line from §4.2 once.
 - **`jq: command not found`** — install it: `brew install jq`.
-- **Research seems to do nothing** — confirm auth (`notebooklm notebook list`), then
+- **Research seems to do nothing** — confirm auth (`notebooklm list`), then
   re-list sources; the async import can take minutes. `research.sh` waits and verifies for
   you.
 
@@ -295,7 +295,7 @@ notebooklm login --browser chrome      # or msedge | chromium | --browser-cookie
 source ~/.kb/venv/bin/activate
 
 # Daily
-notebooklm notebook list
+notebooklm list
 notebooklm ask <NOTEBOOK_ID> "<long, contextual question>"
 notebooklm source add <NOTEBOOK_ID> ~/.kb/build/<key>__<topic>.md
 notebooklm source list <NOTEBOOK_ID>

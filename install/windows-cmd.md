@@ -230,7 +230,7 @@ A quick end-to-end sanity check, all from CMD:
 notebooklm --version
 
 :: 2. auth works and the notebook exists (lists your notebooks)
-notebooklm notebook list
+notebooklm list
 
 :: 3. the source ingested (look for "ready")
 notebooklm source list <NOTEBOOK_ID>

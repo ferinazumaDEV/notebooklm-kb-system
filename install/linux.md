@@ -261,7 +261,7 @@ Confirm auth actually works by hitting the service — listing your notebooks is
 non-destructive:
 
 ```bash
-notebooklm notebook list
+notebooklm list
 ```
 
 If that returns without an auth error, you're set. (If your build names the verb
@@ -369,7 +369,7 @@ notebooklm source fulltext <NOTEBOOK_ID> <SOURCE_ID>    # the raw, usable text
 - **`research.sh: Permission denied`** — it isn't executable. Run
   `chmod +x ~/.kb/research.sh`.
 - **`jq: command not found`** — install it: `sudo apt-get install -y jq` (§1).
-- **Research seems to do nothing** — confirm auth (`notebooklm notebook list`), then
+- **Research seems to do nothing** — confirm auth (`notebooklm list`), then
   re-list sources; the async import can take minutes. `research.sh` already waits and
   verifies, and fails loudly if nothing imported.
 
@@ -398,7 +398,7 @@ echo 'export NOTEBOOKLM_HEADLESS_REAUTH=1' >> ~/.bashrc   # servers + deep runs
 source ~/.kb/venv/bin/activate
 
 # Daily
-notebooklm notebook list
+notebooklm list
 notebooklm ask <NOTEBOOK_ID> "<long, contextual question>"
 notebooklm source add <NOTEBOOK_ID> ~/.kb/build/<key>__<topic>.md
 notebooklm source list <NOTEBOOK_ID>
