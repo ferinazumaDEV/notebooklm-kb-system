@@ -60,7 +60,11 @@ REAUTH_TIMEOUT=150
 # Auth-failure signature (case-insensitive). Covers the CLI's real text:
 #   "Authentication expired or invalid. Redirected to: https://accounts.google.com..."
 #   "Authentication required. Run 'notebooklm login' to re-authenticate."
-AUTH_RE='authentication (expired|required|error)|re-authenticate|redirected to[^"]*accounts\.google|UNAUTHORIZED|AUTH_ERROR'
+#   {"error": true, "code": "AUTH_ERROR", ...}      (expired/invalid session, --json)
+#   {"error": true, "code": "AUTH_REQUIRED", "message": "Auth not found. Run 'notebooklm login' first."}
+#     (missing/empty stored session — e.g. a half-closed login window; notebooklm-py 0.8.2)
+#   "Not logged in."                                  (same case, without --json)
+AUTH_RE='authentication (expired|required|error)|re-authenticate|redirected to[^"]*accounts\.google|UNAUTHORIZED|AUTH_ERROR|AUTH_REQUIRED|auth not found|not logged in'
 
 ts()  { date '+%Y-%m-%d %H:%M:%S'; }
 log() { printf '%s %s\n' "$(ts)" "$*" >> "$LOG"; }
