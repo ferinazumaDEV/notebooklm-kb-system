@@ -414,23 +414,23 @@ Write-Host @"
     (If activation is blocked: Set-ExecutionPolicy -Scope Process -ExecutionPolicy RemoteSigned)
 
     Create your first notebook and add a source:
-        notebooklm notebook create "infra"          # note the <NOTEBOOK_ID> it prints
+        notebooklm create "infra"          # note the <NOTEBOOK_ID> it prints
         New-Item -ItemType Directory -Force -Path "$KbRoot\build" | Out-Null
         Set-Content "$KbRoot\build\infra__architecture.md" "# infra`n`nFirst notes."
-        notebooklm source add <NOTEBOOK_ID> "$KbRoot\build\infra__architecture.md"
-        notebooklm source list <NOTEBOOK_ID>         # wait until it shows "ready"
+        notebooklm source add -n <NOTEBOOK_ID> "$KbRoot\build\infra__architecture.md"
+        notebooklm source list -n <NOTEBOOK_ID>         # wait until it shows "ready"
 
     Record the friendly-key -> id map in $KbRoot\notebooks.json :
         { "infra": "<NOTEBOOK_ID>", "apps": "<NOTEBOOK_ID>", "ops": "<NOTEBOOK_ID>" }
 
     Ask a question (cheap, non-destructive):
-        notebooklm ask <NOTEBOOK_ID> "<an extensive, context-rich question>"
+        notebooklm ask -n <NOTEBOOK_ID> "<an extensive, context-rich question>"
 
     Web research: research.sh is a bash script (needs bash + jq), so run it under
     Git Bash or WSL, or call the CLI directly from PowerShell:
-        notebooklm source add-research <NOTEBOOK_ID> "<topic>" --from web --import-all
+        notebooklm source add-research -n <NOTEBOOK_ID> "<topic>" --from web --import-all --mode fast
         `$env:NOTEBOOKLM_HEADLESS_REAUTH = "1"
-        notebooklm source add-research <NOTEBOOK_ID> "<topic>" --from web --import-all --deep
+        notebooklm source add-research -n <NOTEBOOK_ID> "<topic>" --from web --import-all --mode deep
 
     Full guide: install/windows-powershell.md   Concept + routing: README.md
 "@ -ForegroundColor Gray

@@ -7,6 +7,10 @@ WSL needed, unlike Windows.
 Every value in angle brackets is a placeholder for your own: `<YOUR_EMAIL>`,
 `<NOTEBOOK_ID>`, `<SOURCE_ID>`. Don't paste real secrets into anything you commit.
 
+The `notebooklm` commands below are tested with **notebooklm-py 0.8.2**. They pass the notebook
+explicitly with `-n <NOTEBOOK_ID>`; run `notebooklm use <NOTEBOOK_ID>` once to set a current
+notebook and you can omit `-n`.
+
 > On macOS, `~` and `$HOME` are `/Users/<you>`, so `~/.kb` is your install folder.
 
 ---
@@ -84,7 +88,7 @@ Confirm it's on your PATH:
 
 ```zsh
 notebooklm --version
-notebooklm --help          # lists the verbs: notebook / source / ask / login
+notebooklm --help          # lists the verbs: list / create / source / ask / login
 ```
 
 ---
@@ -167,7 +171,7 @@ echo 'export NOTEBOOKLM_HEADLESS_REAUTH=1' >> ~/.zshrc
 ```
 
 `research.sh deep` also exports this for you, so you mainly need the persistent form if you
-run `add-research --deep` by hand.
+run `add-research --mode deep` by hand.
 
 > **If a later run fails with an auth error,** the stored session expired. Re-run the
 > `notebooklm login ...` command from §4.2 once to re-seed it.
@@ -193,7 +197,7 @@ notebooks over many tiny ones.
 
 ```zsh
 # Create a notebook; note the id it prints back.
-notebooklm notebook create "infra"
+notebooklm create "infra"
 #   -> created notebook <NOTEBOOK_ID>
 
 # Prepare a build-doc (the local file you edit; the notebook reads the uploaded copy).
@@ -201,10 +205,10 @@ mkdir -p ~/.kb/build
 printf '# infra\n\nFirst notes.\n' > ~/.kb/build/infra__architecture.md
 
 # Upload it as a SOURCE (what queries actually read).
-notebooklm source add <NOTEBOOK_ID> ~/.kb/build/infra__architecture.md
+notebooklm source add -n <NOTEBOOK_ID> ~/.kb/build/infra__architecture.md
 
 # Confirm it ingested — wait until the source shows "ready".
-notebooklm source list <NOTEBOOK_ID>
+notebooklm source list -n <NOTEBOOK_ID>
 ```
 
 Record the friendly-key → id mapping so you never paste a raw UUID again — create
@@ -228,11 +232,11 @@ Then edit `~/.kb/memory/MEMORY.md` with your own identity, projects, hard rules 
 Ask a question (the cheap, common operation — reading never changes the corpus):
 
 ```zsh
-notebooklm ask <NOTEBOOK_ID> "<an extensive, context-rich question about your infra>"
+notebooklm ask -n <NOTEBOOK_ID> "<an extensive, context-rich question about your infra>"
 ```
 
 > **Editing a source later** means re-uploading it: edit the build-doc, `source add` the
-> new version, wait until it's **ready**, then `source delete <NOTEBOOK_ID> <OLD_SOURCE_ID>`
+> new version, wait until it's **ready**, then `source delete -n <NOTEBOOK_ID> <OLD_SOURCE_ID>`
 > — always add-new → wait-ready → delete-old, so a notebook is never left at 0 sources.
 > See `docs/OPERATIONS.md`.
 
@@ -257,8 +261,8 @@ long headless job can refresh its own auth (needs the §4 login already seeded).
 Read the imported material back with **fulltext**, not an artifact export:
 
 ```zsh
-notebooklm source list <NOTEBOOK_ID>                 # find the new source id
-notebooklm source fulltext <NOTEBOOK_ID> <SOURCE_ID> # the raw, usable text
+notebooklm source list -n <NOTEBOOK_ID>                 # find the new source id
+notebooklm source fulltext -n <NOTEBOOK_ID> <SOURCE_ID> # the raw, usable text
 ```
 
 ---
@@ -296,10 +300,10 @@ source ~/.kb/venv/bin/activate
 
 # Daily
 notebooklm list
-notebooklm ask <NOTEBOOK_ID> "<long, contextual question>"
-notebooklm source add <NOTEBOOK_ID> ~/.kb/build/<key>__<topic>.md
-notebooklm source list <NOTEBOOK_ID>
-notebooklm source fulltext <NOTEBOOK_ID> <SOURCE_ID>
+notebooklm ask -n <NOTEBOOK_ID> "<long, contextual question>"
+notebooklm source add -n <NOTEBOOK_ID> ~/.kb/build/<key>__<topic>.md
+notebooklm source list -n <NOTEBOOK_ID>
+notebooklm source fulltext -n <NOTEBOOK_ID> <SOURCE_ID>
 
 # Research
 ~/.kb/research.sh <NOTEBOOK_ID> "<topic>" fast

@@ -7,6 +7,10 @@ WSL — see §8).
 Every value in angle brackets is a placeholder for your own: `<YOUR_EMAIL>`,
 `<NOTEBOOK_ID>`, `<SOURCE_ID>`. Don't paste real secrets into any file you commit.
 
+The `notebooklm` commands below are tested with **notebooklm-py 0.8.2**. They pass the notebook
+explicitly with `-n <NOTEBOOK_ID>`; run `notebooklm use <NOTEBOOK_ID>` once to set a current
+notebook and you can omit `-n`.
+
 > **Paths.** In PowerShell, `$HOME` is `C:\Users\<you>`. In Git Bash, `~` maps to the
 > **same** folder. So `$HOME\.kb` (PowerShell) and `~/.kb` (Git Bash) are the same
 > directory — you can drive the install from either shell.
@@ -108,7 +112,7 @@ Confirm the CLI is on your PATH:
 
 ```powershell
 notebooklm --version
-notebooklm --help          # lists the available verbs (notebook / source / ask / login)
+notebooklm --help          # lists the available verbs (list / create / source / ask / login)
 ```
 
 ---
@@ -240,7 +244,7 @@ notebooklm list
 ```
 
 If that returns without an auth error, you're set. (If your build names the verb
-differently, `notebooklm --help` shows the exact subcommands — `notebook create` in §7 is
+differently, `notebooklm --help` shows the exact subcommands — `create` in §7 is
 an equally good live check.)
 
 ---
@@ -252,7 +256,7 @@ notebooks over many tiny ones.
 
 ```powershell
 # Create a notebook; note the id it prints back.
-notebooklm notebook create "infra"
+notebooklm create "infra"
 #   -> created notebook <NOTEBOOK_ID>
 
 # Prepare a build-doc (the local file you edit; the notebook reads the uploaded copy).
@@ -260,10 +264,10 @@ New-Item -ItemType Directory -Force -Path "$HOME\.kb\build" | Out-Null
 Set-Content -Path "$HOME\.kb\build\infra__architecture.md" -Value "# infra`n`nFirst notes."
 
 # Upload it as a SOURCE (what queries actually read).
-notebooklm source add <NOTEBOOK_ID> "$HOME\.kb\build\infra__architecture.md"
+notebooklm source add -n <NOTEBOOK_ID> "$HOME\.kb\build\infra__architecture.md"
 
 # Confirm it ingested — wait until the source shows "ready".
-notebooklm source list <NOTEBOOK_ID>
+notebooklm source list -n <NOTEBOOK_ID>
 ```
 
 Record the friendly-key → id mapping so you never paste a raw UUID again. Create
@@ -276,11 +280,11 @@ Record the friendly-key → id mapping so you never paste a raw UUID again. Crea
 Ask it a question (the cheap, common operation — reading never changes the corpus):
 
 ```powershell
-notebooklm ask <NOTEBOOK_ID> "<an extensive, context-rich question about your infra>"
+notebooklm ask -n <NOTEBOOK_ID> "<an extensive, context-rich question about your infra>"
 ```
 
 > **Editing a source later** means re-uploading it: edit the build-doc, `source add` the
-> new version, wait until it's **ready**, then `source delete <NOTEBOOK_ID> <OLD_SOURCE_ID>`
+> new version, wait until it's **ready**, then `source delete -n <NOTEBOOK_ID> <OLD_SOURCE_ID>`
 > — always add-new → wait-ready → delete-old, so a notebook is never left at 0 sources.
 > See `docs/OPERATIONS.md` §3.
 
@@ -333,21 +337,21 @@ underlying commands straight from PowerShell:
 
 ```powershell
 # FAST — quick, shallow sweep:
-notebooklm source add-research <NOTEBOOK_ID> "<research question or topic>" --from web --import-all
+notebooklm source add-research -n <NOTEBOOK_ID> "<research question or topic>" --from web --import-all --mode fast
 
 # DEEP — broad, multi-source. Enable headless re-auth first (see §5.3):
 $env:NOTEBOOKLM_HEADLESS_REAUTH = "1"
-notebooklm source add-research <NOTEBOOK_ID> "<research question or topic>" --from web --import-all --deep
+notebooklm source add-research -n <NOTEBOOK_ID> "<research question or topic>" --from web --import-all --mode deep
 
 # Then WAIT until every source shows "ready" (an ingesting source can't answer):
-notebooklm source list <NOTEBOOK_ID>
+notebooklm source list -n <NOTEBOOK_ID>
 ```
 
 Read the imported material back with **fulltext**, not an artifact export:
 
 ```powershell
-notebooklm source list <NOTEBOOK_ID>                    # find the new source id
-notebooklm source fulltext <NOTEBOOK_ID> <SOURCE_ID>    # the raw, usable text
+notebooklm source list -n <NOTEBOOK_ID>                    # find the new source id
+notebooklm source fulltext -n <NOTEBOOK_ID> <SOURCE_ID>    # the raw, usable text
 ```
 
 > The difference vs. `research.sh`: the script snapshots the source count, **polls** until
@@ -397,15 +401,15 @@ notebooklm login --browser msedge     # or --browser chrome | chromium | --brows
 
 # Daily
 notebooklm list
-notebooklm ask <NOTEBOOK_ID> "<long, contextual question>"
-notebooklm source add <NOTEBOOK_ID> "$HOME\.kb\build\<key>__<topic>.md"
-notebooklm source list <NOTEBOOK_ID>
-notebooklm source fulltext <NOTEBOOK_ID> <SOURCE_ID>
+notebooklm ask -n <NOTEBOOK_ID> "<long, contextual question>"
+notebooklm source add -n <NOTEBOOK_ID> "$HOME\.kb\build\<key>__<topic>.md"
+notebooklm source list -n <NOTEBOOK_ID>
+notebooklm source fulltext -n <NOTEBOOK_ID> <SOURCE_ID>
 
 # Research (PowerShell-direct; or use research.sh under Git Bash/WSL — §8)
-notebooklm source add-research <NOTEBOOK_ID> "<topic>" --from web --import-all           # fast
+notebooklm source add-research -n <NOTEBOOK_ID> "<topic>" --from web --import-all --mode fast           # fast
 $env:NOTEBOOKLM_HEADLESS_REAUTH = "1"
-notebooklm source add-research <NOTEBOOK_ID> "<topic>" --from web --import-all --deep     # deep
+notebooklm source add-research -n <NOTEBOOK_ID> "<topic>" --from web --import-all --mode deep     # deep
 ```
 
 ---

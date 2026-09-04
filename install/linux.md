@@ -7,6 +7,10 @@ lines to your package manager.
 Every value in angle brackets is a placeholder for your own: `<YOUR_EMAIL>`,
 `<NOTEBOOK_ID>`, `<SOURCE_ID>`. Don't paste real secrets into any file you commit.
 
+The `notebooklm` commands below are tested with **notebooklm-py 0.8.2**. They pass the notebook
+explicitly with `-n <NOTEBOOK_ID>`; run `notebooklm use <NOTEBOOK_ID>` once to set a current
+notebook and you can omit `-n`.
+
 > **Two kinds of machine.** A **desktop** (has a graphical display) can run the one-time
 > interactive `notebooklm login` directly. A **headless server** (no display — a VPS, a
 > box you only reach over SSH) cannot pop a browser window, so it needs a slightly
@@ -95,7 +99,7 @@ Confirm the CLI is on your PATH (it lives in the venv you just activated):
 
 ```bash
 notebooklm --version
-notebooklm --help          # lists the available verbs (notebook / source / ask / login)
+notebooklm --help          # lists the available verbs (list / create / source / ask / login)
 ```
 
 ---
@@ -265,7 +269,7 @@ notebooklm list
 ```
 
 If that returns without an auth error, you're set. (If your build names the verb
-differently, `notebooklm --help` shows the exact subcommands — `notebook create` in §7 is
+differently, `notebooklm --help` shows the exact subcommands — `create` in §7 is
 an equally good live check.)
 
 ---
@@ -277,7 +281,7 @@ notebooks over many tiny ones.
 
 ```bash
 # Create a notebook; note the id it prints back.
-notebooklm notebook create "infra"
+notebooklm create "infra"
 #   -> created notebook <NOTEBOOK_ID>
 
 # Prepare a build-doc (the local file you edit; the notebook reads the uploaded copy).
@@ -285,10 +289,10 @@ mkdir -p ~/.kb/build
 printf '# infra\n\nFirst notes.\n' > ~/.kb/build/infra__architecture.md
 
 # Upload it as a SOURCE (what queries actually read).
-notebooklm source add <NOTEBOOK_ID> ~/.kb/build/infra__architecture.md
+notebooklm source add -n <NOTEBOOK_ID> ~/.kb/build/infra__architecture.md
 
 # Confirm it ingested — wait until the source shows "ready".
-notebooklm source list <NOTEBOOK_ID>
+notebooklm source list -n <NOTEBOOK_ID>
 ```
 
 Record the friendly-key → id mapping so you never paste a raw UUID again. Create
@@ -301,11 +305,11 @@ Record the friendly-key → id mapping so you never paste a raw UUID again. Crea
 Ask it a question (the cheap, common operation — reading never changes the corpus):
 
 ```bash
-notebooklm ask <NOTEBOOK_ID> "<an extensive, context-rich question about your infra>"
+notebooklm ask -n <NOTEBOOK_ID> "<an extensive, context-rich question about your infra>"
 ```
 
 > **Editing a source later** means re-uploading it: edit the build-doc, `source add` the
-> new version, wait until it's **ready**, then `source delete <NOTEBOOK_ID> <OLD_SOURCE_ID>`
+> new version, wait until it's **ready**, then `source delete -n <NOTEBOOK_ID> <OLD_SOURCE_ID>`
 > — always add-new → wait-ready → delete-old, so a notebook is never left at 0 sources.
 > See `docs/OPERATIONS.md` §3.
 
@@ -341,8 +345,8 @@ source ~/.kb/venv/bin/activate      # if not already active
 Read the imported material back with **fulltext**, not an artifact export:
 
 ```bash
-notebooklm source list <NOTEBOOK_ID>                    # find the new source id
-notebooklm source fulltext <NOTEBOOK_ID> <SOURCE_ID>    # the raw, usable text
+notebooklm source list -n <NOTEBOOK_ID>                    # find the new source id
+notebooklm source fulltext -n <NOTEBOOK_ID> <SOURCE_ID>    # the raw, usable text
 ```
 
 ---
@@ -399,10 +403,10 @@ source ~/.kb/venv/bin/activate
 
 # Daily
 notebooklm list
-notebooklm ask <NOTEBOOK_ID> "<long, contextual question>"
-notebooklm source add <NOTEBOOK_ID> ~/.kb/build/<key>__<topic>.md
-notebooklm source list <NOTEBOOK_ID>
-notebooklm source fulltext <NOTEBOOK_ID> <SOURCE_ID>
+notebooklm ask -n <NOTEBOOK_ID> "<long, contextual question>"
+notebooklm source add -n <NOTEBOOK_ID> ~/.kb/build/<key>__<topic>.md
+notebooklm source list -n <NOTEBOOK_ID>
+notebooklm source fulltext -n <NOTEBOOK_ID> <SOURCE_ID>
 
 # Research
 cp research.sh ~/.kb/ && chmod +x ~/.kb/research.sh        # first time only

@@ -296,11 +296,11 @@ refresh their own session (deep research needs this):
     # persist it, e.g.:  echo 'export NOTEBOOKLM_HEADLESS_REAUTH=1' >> ~/.bashrc   (or ~/.zshrc)
 
 ${C_BOLD}Create your first notebook and add a source:${C_RST}
-    notebooklm notebook create "infra"           # note the <NOTEBOOK_ID> it prints
+    notebooklm create "infra"           # note the <NOTEBOOK_ID> it prints
     mkdir -p ~/.kb/build
     printf '# infra\\n\\nFirst notes.\\n' > ~/.kb/build/infra__architecture.md
-    notebooklm source add <NOTEBOOK_ID> ~/.kb/build/infra__architecture.md
-    notebooklm source list <NOTEBOOK_ID>          # wait until it shows "ready"
+    notebooklm source add -n <NOTEBOOK_ID> ~/.kb/build/infra__architecture.md
+    notebooklm source list -n <NOTEBOOK_ID>          # wait until it shows "ready"
 
 ${C_BOLD}Record the friendly-key -> id map${C_RST} in ~/.kb/notebooks.json:
     { "infra": "<NOTEBOOK_ID>", "apps": "<NOTEBOOK_ID>", "ops": "<NOTEBOOK_ID>" }
@@ -312,7 +312,7 @@ ${C_BOLD}Copy the kit's docs + templates into your install${C_RST} (from the rep
     cp "$REPO_ROOT/research.sh" ~/.kb/ && chmod +x ~/.kb/research.sh
 
 ${C_BOLD}Ask a question (cheap, non-destructive) and run web research:${C_RST}
-    notebooklm ask <NOTEBOOK_ID> "<an extensive, context-rich question>"
+    notebooklm ask -n <NOTEBOOK_ID> "<an extensive, context-rich question>"
     ~/.kb/research.sh <NOTEBOOK_ID> "<research topic>" fast   # quick sweep
     ~/.kb/research.sh <NOTEBOOK_ID> "<research topic>" deep   # broad, multi-source
 
