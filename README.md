@@ -121,7 +121,7 @@ Two ways to install: an **automated script**, or a **step-by-step guide** for yo
 - **Linux / macOS** → [`install/install.sh`](install/install.sh): `bash install/install.sh`
 - **Windows (PowerShell)** → [`install/install.ps1`](install/install.ps1)
 
-Both scripts create the isolated `~/.kb/` virtualenv, install `notebooklm[browser]`, install
+Both scripts create the isolated `~/.kb/` virtualenv, install `notebooklm-py[browser,cookies]`, install
 the browser binary Playwright drives, and lay down the config skeleton. They **auto-detect a
 browser you already have** (Chrome / Edge / Brave / Firefox) and drive that — **you don't need
 to install a specific browser** just for this.

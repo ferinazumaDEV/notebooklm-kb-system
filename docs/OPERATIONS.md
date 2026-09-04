@@ -204,13 +204,15 @@ Deep research drives a real browser and therefore needs a valid, refreshable log
 that works without a visible window. Set this up once per machine.
 
 ```bash
-# 1. Install the browser automation library and its browser binaries.
-pip install playwright
-playwright install            # or: playwright install chromium
+# 1. Install the CLI with its browser extras. [browser] already pins Playwright
+#    (no separate `pip install playwright`); [cookies] is needed for
+#    `login --browser-cookies` (Firefox/Brave).
+pip install "notebooklm-py[browser,cookies]"
 
-# 2. Install the tool's browser extra (the optional dependency group that
-#    enables browser-backed / deep flows).
-pip install "notebooklm[browser]"
+# 2. ONLY if you have no system Chrome / Chromium / Edge for Playwright to drive:
+#    download Playwright's own Chromium (a bare `playwright install` would pull
+#    several browsers). install/install.sh does the same check.
+playwright install chromium
 
 # 3. Log in ONCE, interactively, to seed the stored session/cookies.
 notebooklm login
@@ -276,8 +278,8 @@ kb source delete <KEY> <OLD_SOURCE_ID>           # remove stale source
 ~/.kb/research.sh --mode deep --into <KEY> "<topic>"   # deep (needs §5)
 
 # ONE-TIME DEEP SETUP
-pip install playwright && playwright install
-pip install "notebooklm[browser]"
+pip install "notebooklm-py[browser,cookies]"
+playwright install chromium                      # only if no system Chrome/Chromium/Edge
 notebooklm login
 export NOTEBOOKLM_HEADLESS_REAUTH=1
 

@@ -17,7 +17,7 @@ Every value in angle brackets is a placeholder for your own: `<YOUR_EMAIL>`,
 
 1. Install Python 3.11+
 2. Create and activate a virtualenv (PowerShell syntax)
-3. Install the CLI: `pip install "notebooklm[browser]"`
+3. Install the CLI: `pip install "notebooklm-py[browser,cookies]"`
 4. Install a Playwright browser — **only if you have no system browser** (§4)
 5. Detect which browser you have and run `notebooklm login` with the right flag
 6. Verify with a real operation
@@ -95,13 +95,14 @@ To leave the venv later: `deactivate`.
 ## 3. Install the CLI (with the browser extra)
 
 ```powershell
-pip install "notebooklm[browser]"
+pip install "notebooklm-py[browser,cookies]"
 ```
 
 > The `[browser]` extra is the optional dependency group that enables the browser-backed
-> flows: **interactive login, headless re-auth, and deep research**. Plain
-> `pip install notebooklm` gives you only the bare CLI and will fail at login/research
-> later. Install the extra now.
+> flows: **interactive login, headless re-auth, and deep research**; the `[cookies]` extra
+> is what `notebooklm login --browser-cookies ...` (the Firefox/Brave path in §5) needs.
+> Plain `pip install notebooklm-py` gives you only the bare CLI and will fail at
+> login/research later. Install the extras now.
 
 Confirm the CLI is on your PATH:
 
@@ -387,7 +388,7 @@ notebooklm source fulltext <NOTEBOOK_ID> <SOURCE_ID>    # the raw, usable text
 py -3.11 -m venv "$HOME\.kb\venv"
 & "$HOME\.kb\venv\Scripts\Activate.ps1"
 python -m pip install --upgrade pip
-pip install "notebooklm[browser]"
+pip install "notebooklm-py[browser,cookies]"
 # playwright install chromium         # only if no system browser
 notebooklm login --browser msedge     # or --browser chrome | chromium | --browser-cookies firefox|brave
 

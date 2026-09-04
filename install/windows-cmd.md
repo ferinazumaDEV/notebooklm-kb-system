@@ -74,13 +74,14 @@ To leave the venv later, just run `deactivate`.
 With the venv active:
 
 ```bat
-pip install "notebooklm[browser]"
+pip install "notebooklm-py[browser,cookies]"
 ```
 
 The `[browser]` extra is the optional dependency group that enables every browser-backed
-flow: interactive login, headless re-auth, and deep research. Plain `pip install notebooklm`
-gives you a CLI that can `ask` but **fails at login and research** — install the extra now to
-avoid that confusing half-working state later.
+flow: interactive login, headless re-auth, and deep research; the `[cookies]` extra is what
+`notebooklm login --browser-cookies ...` (the Firefox/Brave path in §3) needs. Plain
+`pip install notebooklm-py` gives you a CLI that can `ask` but **fails at login and research**
+— install the extras now to avoid that confusing half-working state later.
 
 Confirm it landed:
 
@@ -332,7 +333,7 @@ Every line that differs between the two Windows shells:
 | Comment in a script | `:: comment` (or `rem`) | `# comment` |
 | Find a command | `where notebooklm` | `Get-Command notebooklm` |
 
-Everything else — `pip install "notebooklm[browser]"`, `playwright install chromium`, and all
+Everything else — `pip install "notebooklm-py[browser,cookies]"`, `playwright install chromium`, and all
 the `notebooklm ...` subcommands — is **identical** in both shells.
 
 ---

@@ -12,7 +12,7 @@
 #   1. Checks you have a usable Python (3.9+).
 #   2. Creates an isolated virtualenv (default: ~/.kb-venv; --local uses ./.venv) and
 #      activates it, so the CLI + its browser automation can't clash with system Python.
-#   3. Installs the CLI WITH the browser extra:  pip install "notebooklm[browser]".
+#   3. Installs the CLI WITH its browser extras:  pip install "notebooklm-py[browser,cookies]".
 #   4. DETECTS which browser you have and picks the correct login flag:
 #        - Chrome / Chromium / Edge  ->  notebooklm login --browser chrome|chromium|msedge
 #        - only Firefox / Brave      ->  notebooklm login --browser-cookies firefox|brave
@@ -147,19 +147,20 @@ python -m ensurepip --upgrade >/dev/null 2>&1 || true
 python -m pip install --quiet --upgrade pip >/dev/null 2>&1 || warn "could not upgrade pip (continuing)"
 
 # =======================================================================================
-# 3. Install the CLI  (WITH the browser extra — needed for login + research)
+# 3. Install the CLI  (WITH the browser extras — needed for login + research)
 # =======================================================================================
-step "3/6  Installing notebooklm[browser]"
+step "3/6  Installing notebooklm-py[browser,cookies]"
 
 # The [browser] extra is the optional dependency group that enables the browser-backed
-# flows (interactive login, headless re-auth, deep research). Plain `notebooklm` fails
-# at login/research later, so we always install the extra.
+# flows (interactive login, headless re-auth, deep research); [cookies] is what
+# `login --browser-cookies` (the Firefox/Brave path below) needs. Plain `notebooklm-py`
+# fails at login/research later, so we always install both extras.
 if command -v notebooklm >/dev/null 2>&1 && [ "${#PIP_UPGRADE[@]}" -eq 0 ]; then
-  log "notebooklm already installed — ensuring the [browser] extra is satisfied ..."
+  log "notebooklm already installed — ensuring the [browser,cookies] extras are satisfied ..."
 fi
 # Note: ${PIP_UPGRADE[@]+"..."} expands to nothing when the array is empty WITHOUT
 # tripping `set -u` on old bash (macOS ships 3.2, where a bare "${empty[@]}" errors).
-python -m pip install ${PIP_UPGRADE[@]+"${PIP_UPGRADE[@]}"} "notebooklm[browser]" \
+python -m pip install ${PIP_UPGRADE[@]+"${PIP_UPGRADE[@]}"} "notebooklm-py[browser,cookies]" \
   || die "pip install failed. Check your network / proxy and retry."
 
 command -v notebooklm >/dev/null 2>&1 \

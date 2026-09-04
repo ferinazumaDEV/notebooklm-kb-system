@@ -15,7 +15,7 @@ Every value in angle brackets is a placeholder for your own: `<YOUR_EMAIL>`,
 
 1. Install Python 3.11+ (Homebrew or python.org)
 2. Create and activate a virtualenv (zsh)
-3. Install the CLI: `pip install "notebooklm[browser]"`
+3. Install the CLI: `pip install "notebooklm-py[browser,cookies]"`
 4. Detect your browser and run `notebooklm login` with the right flag
 5. Verify with a real operation
 6. Create a notebook and add a source
@@ -71,13 +71,14 @@ python -m pip install --upgrade pip
 ## 3. Install the CLI (with the browser extra)
 
 ```zsh
-pip install "notebooklm[browser]"
+pip install "notebooklm-py[browser,cookies]"
 ```
 
 > The `[browser]` extra is the optional dependency group that enables the browser-backed
-> flows: **interactive login, headless re-auth, and deep research**. Plain
-> `pip install notebooklm` gives you only the bare CLI and fails at login/research later.
-> Install the extra now.
+> flows: **interactive login, headless re-auth, and deep research**; the `[cookies]` extra
+> is what `notebooklm login --browser-cookies ...` (the Firefox/Brave path in §4) needs.
+> Plain `pip install notebooklm-py` gives you only the bare CLI and fails at login/research
+> later. Install the extras now.
 
 Confirm it's on your PATH:
 
@@ -287,7 +288,7 @@ notebooklm source fulltext <NOTEBOOK_ID> <SOURCE_ID> # the raw, usable text
 python3 -m venv ~/.kb/venv
 source ~/.kb/venv/bin/activate
 python -m pip install --upgrade pip
-pip install "notebooklm[browser]"
+pip install "notebooklm-py[browser,cookies]"
 notebooklm login --browser chrome      # or msedge | chromium | --browser-cookies firefox|brave
 
 # Every new shell
