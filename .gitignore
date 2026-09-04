@@ -4,3 +4,12 @@ __pycache__/
 *.pyc
 .DS_Store
 node_modules/
+
+# Local KB state the docs tell you to create — session cookies, notebook ids, titles.
+# Never commit these (README "Security").
+nblm_state.json
+storage_state.json*
+master_token.json
+notebooks.json
+source_titles.json
+.kb/
