@@ -57,6 +57,10 @@ COOLDOWN="${HC_COOLDOWN:-21600}"
 PROBE_TIMEOUT=60
 REAUTH_TIMEOUT=150
 
+# `timeout` is GNU coreutils; stock macOS only has it as `gtimeout` (brew install coreutils).
+TIMEOUT=$(command -v timeout || command -v gtimeout || true)
+[ -n "$TIMEOUT" ] || { echo 'healthcheck.sh: need coreutils timeout (macOS: brew install coreutils)' >&2; exit 2; }
+
 # Auth-failure signature (case-insensitive). Covers the CLI's real text:
 #   "Authentication expired or invalid. Redirected to: https://accounts.google.com..."
 #   "Authentication required. Run 'notebooklm login' to re-authenticate."
@@ -72,7 +76,7 @@ log() { printf '%s %s\n' "$(ts)" "$*" >> "$LOG"; }
 # probe(): 0 = healthy | 10 = auth failure | 20 = other failure (network, etc.)
 probe() {
   local out rc
-  out=$(timeout "$PROBE_TIMEOUT" "$NB" source list -n "$NB_ID" --json 2>&1); rc=$?
+  out=$("$TIMEOUT" "$PROBE_TIMEOUT" "$NB" source list -n "$NB_ID" --json 2>&1); rc=$?
   LAST_OUT="$out"
   if [ "$rc" -eq 0 ] && ! printf '%s' "$out" | grep -qiE '"error"[[:space:]]*:[[:space:]]*true'; then
     return 0
@@ -86,17 +90,20 @@ probe() {
 # (redirect to accounts.google.com) this CANNOT fix it — hence the email.
 reauth() {
   log "auth down -> keepalive (auth refresh)"
-  timeout "$REAUTH_TIMEOUT" "$NB" auth refresh >/dev/null 2>&1
+  "$TIMEOUT" "$REAUTH_TIMEOUT" "$NB" auth refresh >/dev/null 2>&1
   probe && { log "recovered via keepalive"; return 0; }
   log "keepalive not enough -> headless re-mint (NOTEBOOKLM_HEADLESS_REAUTH=1)"
-  NOTEBOOKLM_HEADLESS_REAUTH=1 timeout "$REAUTH_TIMEOUT" "$NB" source list -n "$NB_ID" --json >/dev/null 2>&1
+  NOTEBOOKLM_HEADLESS_REAUTH=1 "$TIMEOUT" "$REAUTH_TIMEOUT" "$NB" source list -n "$NB_ID" --json >/dev/null 2>&1
   probe && { log "recovered via headless re-mint"; return 0; }
   return 1
 }
 
 send_alert() {
   if [ -f "$STAMP" ]; then
-    local age=$(( $(date +%s) - $(stat -c %Y "$STAMP" 2>/dev/null || echo 0) ))
+    # GNU stat -c %Y; BSD/macOS stat -f %m.
+    local mtime age
+    mtime=$(stat -c %Y "$STAMP" 2>/dev/null || stat -f %m "$STAMP" 2>/dev/null || echo 0)
+    age=$(( $(date +%s) - mtime ))
     if [ "$age" -lt "$COOLDOWN" ]; then
       log "still down; alert muted by cooldown (${age}s < ${COOLDOWN}s)"; return 0
     fi
