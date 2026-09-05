@@ -78,7 +78,7 @@ To leave the venv later, just run `deactivate`.
 With the venv active:
 
 ```bat
-pip install "notebooklm-py[browser,cookies]"
+pip install "notebooklm-py[browser,cookies]>=0.8.2,<0.9"
 ```
 
 The `[browser]` extra is the optional dependency group that enables every browser-backed
@@ -337,7 +337,7 @@ Every line that differs between the two Windows shells:
 | Comment in a script | `:: comment` (or `rem`) | `# comment` |
 | Find a command | `where notebooklm` | `Get-Command notebooklm` |
 
-Everything else — `pip install "notebooklm-py[browser,cookies]"`, `playwright install chromium`, and all
+Everything else — `pip install "notebooklm-py[browser,cookies]>=0.8.2,<0.9"`, `playwright install chromium`, and all
 the `notebooklm ...` subcommands — is **identical** in both shells.
 
 ---

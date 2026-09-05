@@ -122,7 +122,7 @@ Two ways to install: an **automated script**, or a **step-by-step guide** for yo
 - **Windows (PowerShell)** → [`install/install.ps1`](install/install.ps1)
 
 Both scripts create the virtualenv (`~/.kb/venv`, Windows `$HOME\.kb\venv`), install the CLI
-with its browser extras (`notebooklm-py[browser,cookies]`), and **detect a browser you already
+with its browser extras (`notebooklm-py[browser,cookies]>=0.8.2,<0.9`), and **detect a browser you already
 have** (Chrome / Chromium / Edge / Brave / Firefox); only if none is found do they download
 Playwright's Chromium. They do not create the `~/.kb/` config files — the printed next steps
 show how. On a fresh Linux server also run `sudo ~/.kb/venv/bin/playwright install-deps chromium`

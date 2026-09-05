@@ -23,7 +23,7 @@ notebook and you can omit `-n`.
 
 1. Install prerequisites with `apt` (`python3-venv`, `pip`, `jq`)
 2. Create and activate a virtualenv
-3. Install the CLI: `pip install "notebooklm-py[browser,cookies]"`
+3. Install the CLI: `pip install "notebooklm-py[browser,cookies]>=0.8.2,<0.9"`
 4. Install a Playwright browser + its system libraries
 5. Detect which browser you have and run `notebooklm login` with the right flag
    (desktop in §5.2, headless server in §5.3)
@@ -85,7 +85,7 @@ To leave the venv later: `deactivate`.
 ## 3. Install the CLI (with the browser extra)
 
 ```bash
-pip install "notebooklm-py[browser,cookies]"
+pip install "notebooklm-py[browser,cookies]>=0.8.2,<0.9"
 ```
 
 > The `[browser]` extra is the optional dependency group that enables the browser-backed
@@ -358,7 +358,7 @@ notebooklm source fulltext -n <NOTEBOOK_ID> <SOURCE_ID>    # the raw, usable tex
 - **`python3 -m venv` fails with "ensurepip is not available"** — `python3-venv` isn't
   installed. Run the §1 `apt-get install` line.
 - **`playwright: command not found`** — the venv isn't active, or the `[browser]` extra
-  wasn't installed. Re-activate the venv and re-run `pip install "notebooklm-py[browser,cookies]"`.
+  wasn't installed. Re-activate the venv and re-run `pip install "notebooklm-py[browser,cookies]>=0.8.2,<0.9"`.
 - **Chromium launches but immediately errors about a missing `.so` library** — the system
   libraries aren't installed. Run `sudo ~/.kb/venv/bin/playwright install-deps chromium`
   (§4).
@@ -387,7 +387,7 @@ sudo apt-get update && sudo apt-get install -y python3 python3-venv python3-pip 
 mkdir -p ~/.kb && python3 -m venv ~/.kb/venv
 source ~/.kb/venv/bin/activate
 python -m pip install --upgrade pip
-pip install "notebooklm-py[browser,cookies]"
+pip install "notebooklm-py[browser,cookies]>=0.8.2,<0.9"
 playwright install chromium
 sudo ~/.kb/venv/bin/playwright install-deps chromium
 

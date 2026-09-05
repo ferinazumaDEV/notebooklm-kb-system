@@ -208,7 +208,7 @@ that works without a visible window. Set this up once per machine.
 # 1. Install the CLI with its browser extras. [browser] already pins Playwright
 #    (no separate `pip install playwright`); [cookies] is needed for
 #    `login --browser-cookies` (Firefox/Brave).
-pip install "notebooklm-py[browser,cookies]"
+pip install "notebooklm-py[browser,cookies]>=0.8.2,<0.9"
 
 # 2. ONLY if you have no system Chrome / Chromium / Edge for Playwright to drive:
 #    download Playwright's own Chromium (a bare `playwright install` would pull
@@ -280,7 +280,7 @@ kb source delete <KEY> <OLD_SOURCE_ID>           # remove stale source
 ~/.kb/research.sh <NOTEBOOK_ID> "<topic>" deep   # deep (needs §5)
 
 # ONE-TIME DEEP SETUP
-pip install "notebooklm-py[browser,cookies]"
+pip install "notebooklm-py[browser,cookies]>=0.8.2,<0.9"
 playwright install chromium                      # only if no system Chrome/Chromium/Edge
 notebooklm login
 export NOTEBOOKLM_HEADLESS_REAUTH=1
