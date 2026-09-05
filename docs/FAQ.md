@@ -156,7 +156,7 @@ Google or NotebookLM. NotebookLM is a product of Google; this repo is a separate
 ## What do I need to install it?
 
 `bash`, `jq`, and the `notebooklm` CLI on your `PATH`; the automated installer builds an
-isolated `~/.kb/` virtualenv, installs `notebooklm-py[browser,cookies]`, and auto-detects a browser you
+isolated `~/.kb/` virtualenv, installs `notebooklm-py[browser,cookies]>=0.8.2,<0.9`, and auto-detects a browser you
 already have (Chrome / Edge / Brave / Firefox) — you don't need to install a specific browser
 just for this. See [Installation](../README.md#installation) for the automated scripts and the
 step-by-step guides per terminal.

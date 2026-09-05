@@ -21,7 +21,7 @@ notebook and you can omit `-n`.
 
 1. Install Python 3.10+ (3.11 recommended)
 2. Create and activate a virtualenv (PowerShell syntax)
-3. Install the CLI: `pip install "notebooklm-py[browser,cookies]"`
+3. Install the CLI: `pip install "notebooklm-py[browser,cookies]>=0.8.2,<0.9"`
 4. Install a Playwright browser — **only if you have no system browser** (§4)
 5. Detect which browser you have and run `notebooklm login` with the right flag
 6. Verify with a real operation
@@ -99,7 +99,7 @@ To leave the venv later: `deactivate`.
 ## 3. Install the CLI (with the browser extra)
 
 ```powershell
-pip install "notebooklm-py[browser,cookies]"
+pip install "notebooklm-py[browser,cookies]>=0.8.2,<0.9"
 ```
 
 > The `[browser]` extra is the optional dependency group that enables the browser-backed
@@ -392,7 +392,7 @@ notebooklm source fulltext -n <NOTEBOOK_ID> <SOURCE_ID>    # the raw, usable tex
 py -3.11 -m venv "$HOME\.kb\venv"
 & "$HOME\.kb\venv\Scripts\Activate.ps1"
 python -m pip install --upgrade pip
-pip install "notebooklm-py[browser,cookies]"
+pip install "notebooklm-py[browser,cookies]>=0.8.2,<0.9"
 # playwright install chromium         # only if no system browser
 notebooklm login --browser msedge     # or --browser chrome | chromium | --browser-cookies firefox|brave
 

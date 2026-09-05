@@ -12,7 +12,7 @@
 #   1. Checks you have a usable Python (3.10+).
 #   2. Creates an isolated virtualenv (default: ~/.kb/venv; --local uses ./.venv) and
 #      activates it, so the CLI + its browser automation can't clash with system Python.
-#   3. Installs the CLI WITH its browser extras:  pip install "notebooklm-py[browser,cookies]".
+#   3. Installs the CLI WITH its browser extras:  pip install "notebooklm-py[browser,cookies]>=0.8.2,<0.9".
 #   4. DETECTS which browser you have and picks the correct login flag:
 #        - Chrome / Chromium / Edge  ->  notebooklm login --browser chrome|chromium|msedge
 #        - only Firefox / Brave      ->  notebooklm login --browser-cookies firefox|brave
@@ -149,7 +149,7 @@ python -m pip install --quiet --upgrade pip >/dev/null 2>&1 || warn "could not u
 # =======================================================================================
 # 3. Install the CLI  (WITH the browser extras — needed for login + research)
 # =======================================================================================
-step "3/6  Installing notebooklm-py[browser,cookies]"
+step "3/6  Installing notebooklm-py[browser,cookies]>=0.8.2,<0.9"
 
 # The [browser] extra is the optional dependency group that enables the browser-backed
 # flows (interactive login, headless re-auth, deep research); [cookies] is what
@@ -160,7 +160,7 @@ if command -v notebooklm >/dev/null 2>&1 && [ "${#PIP_UPGRADE[@]}" -eq 0 ]; then
 fi
 # Note: ${PIP_UPGRADE[@]+"..."} expands to nothing when the array is empty WITHOUT
 # tripping `set -u` on old bash (macOS ships 3.2, where a bare "${empty[@]}" errors).
-python -m pip install ${PIP_UPGRADE[@]+"${PIP_UPGRADE[@]}"} "notebooklm-py[browser,cookies]" \
+python -m pip install ${PIP_UPGRADE[@]+"${PIP_UPGRADE[@]}"} "notebooklm-py[browser,cookies]>=0.8.2,<0.9" \
   || die "pip install failed. Check your network / proxy and retry."
 
 command -v notebooklm >/dev/null 2>&1 \

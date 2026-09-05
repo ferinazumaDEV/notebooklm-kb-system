@@ -7,7 +7,7 @@
 
       1. Finds a suitable Python (3.10+; 3.11+ recommended).
       2. Creates an isolated virtualenv under the KB root (default: $HOME\.kb\venv).
-      3. Installs the CLI with its browser extras:  pip install "notebooklm-py[browser,cookies]".
+      3. Installs the CLI with its browser extras:  pip install "notebooklm-py[browser,cookies]>=0.8.2,<0.9".
       4. DETECTS which browser you have (Chrome / Edge / Brave / Firefox) via the
          registry App Paths and the usual Program Files locations, and chooses the
          right login flag:
@@ -244,11 +244,11 @@ else {
 # ===========================================================================
 # 3. INSTALL THE CLI (with the browser extras)
 # ===========================================================================
-Write-Step "Installing notebooklm-py[browser,cookies] into the venv"
+Write-Step "Installing notebooklm-py[browser,cookies]>=0.8.2,<0.9 into the venv"
 # Upgrade pip inside the fresh venv first, then install the CLI + its extras
 # ([browser] for Playwright-driven login, [cookies] for --browser-cookies).
 Invoke-Native -Exe $venvPython -Arguments @('-m', 'pip', 'install', '--upgrade', 'pip') -What "pip upgrade"
-Invoke-Native -Exe $venvPython -Arguments @('-m', 'pip', 'install', 'notebooklm-py[browser,cookies]') -What "pip install notebooklm-py[browser,cookies]"
+Invoke-Native -Exe $venvPython -Arguments @('-m', 'pip', 'install', 'notebooklm-py[browser,cookies]>=0.8.2,<0.9') -What "pip install notebooklm-py[browser,cookies]>=0.8.2,<0.9"
 
 if (-not (Test-Path $notebooklmExe)) {
     throw "Install finished but $notebooklmExe is missing — the CLI did not install correctly."

@@ -19,7 +19,7 @@ notebook and you can omit `-n`.
 
 1. Install Python 3.10+ (3.11 recommended; Homebrew or python.org)
 2. Create and activate a virtualenv (zsh)
-3. Install the CLI: `pip install "notebooklm-py[browser,cookies]"`
+3. Install the CLI: `pip install "notebooklm-py[browser,cookies]>=0.8.2,<0.9"`
 4. Detect your browser and run `notebooklm login` with the right flag
 5. Verify with a real operation
 6. Create a notebook and add a source
@@ -75,7 +75,7 @@ python -m pip install --upgrade pip
 ## 3. Install the CLI (with the browser extra)
 
 ```zsh
-pip install "notebooklm-py[browser,cookies]"
+pip install "notebooklm-py[browser,cookies]>=0.8.2,<0.9"
 ```
 
 > The `[browser]` extra is the optional dependency group that enables the browser-backed
@@ -292,7 +292,7 @@ notebooklm source fulltext -n <NOTEBOOK_ID> <SOURCE_ID> # the raw, usable text
 python3 -m venv ~/.kb/venv
 source ~/.kb/venv/bin/activate
 python -m pip install --upgrade pip
-pip install "notebooklm-py[browser,cookies]"
+pip install "notebooklm-py[browser,cookies]>=0.8.2,<0.9"
 notebooklm login --browser chrome      # or msedge | chromium | --browser-cookies firefox|brave
 
 # Every new shell
