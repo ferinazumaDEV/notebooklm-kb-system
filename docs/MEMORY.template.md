@@ -20,6 +20,8 @@ identity, hard rules, method feedback, open WIP) · EXTERNAL (a NotebookLM noteb
 reference, procedures, commands, gotchas, negative findings, stable design) · NONE (live
 state → verify on the system, never store). If the reference material is not in local memory,
 **don't guess it** — query the notebook: `~/.kb/nb <notebook-key> "<extensive question with full context>"`.
+(`nb` stands for a tiny wrapper you write that maps a key to a notebook id via `notebooks.json`
+and calls `notebooklm ask -n <NOTEBOOK_ID>`; it is not included in this repo.)
 Canonical rule: see [[feedback-knowledge-routing]].
 
 ---

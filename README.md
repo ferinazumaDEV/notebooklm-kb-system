@@ -106,7 +106,7 @@ The full rule, with worked examples, is in
 ## Quick start
 
 1. **Pick your terminal guide** in [Installation](#installation) below — or just run the automated installer.
-2. **Run the installer:** `bash install/install.sh` (Linux/macOS) or `install/install.ps1` (Windows/PowerShell). It builds the `~/.kb/` venv, installs the CLI, and detects your browser automatically.
+2. **Run the installer** (needs Python 3.10+): `bash install/install.sh` (Linux/macOS) or `install/install.ps1` (Windows/PowerShell). It builds the `~/.kb/venv` virtualenv (Windows: `$HOME\.kb\venv`), installs the CLI, and detects your browser automatically.
 3. **Log in once:** `notebooklm login` — seeds a reusable, headless-capable session on this machine.
 4. **First research:** `~/.kb/research.sh <NOTEBOOK_ID> "<an extensive, context-rich question>" fast`.
 
@@ -121,10 +121,12 @@ Two ways to install: an **automated script**, or a **step-by-step guide** for yo
 - **Linux / macOS** → [`install/install.sh`](install/install.sh): `bash install/install.sh`
 - **Windows (PowerShell)** → [`install/install.ps1`](install/install.ps1)
 
-Both scripts create the isolated `~/.kb/` virtualenv, install `notebooklm[browser]`, install
-the browser binary Playwright drives, and lay down the config skeleton. They **auto-detect a
-browser you already have** (Chrome / Edge / Brave / Firefox) and drive that — **you don't need
-to install a specific browser** just for this.
+Both scripts create the virtualenv (`~/.kb/venv`, Windows `$HOME\.kb\venv`), install the CLI
+with its browser extras (`notebooklm-py[browser,cookies]`), and **detect a browser you already
+have** (Chrome / Chromium / Edge / Brave / Firefox); only if none is found do they download
+Playwright's Chromium. They do not create the `~/.kb/` config files — the printed next steps
+show how. On a fresh Linux server also run `sudo ~/.kb/venv/bin/playwright install-deps chromium`
+([install/linux.md §4](install/linux.md)).
 
 ### Step-by-step guides
 
@@ -172,6 +174,9 @@ notebooklm-kb-system/
 ├── research.sh                      # web-research wrapper: research.sh <NOTEBOOK_ID> "<query>" fast|deep
 ├── healthcheck.sh                   # auth healthcheck + email alert (see docs/AUTH-RESILIENCE.md)
 ├── LICENSE                          # AGPL-3.0
+├── tests/
+│   ├── run.sh                       # bash tests/run.sh — behaviour tests for both scripts (see below)
+│   └── bin/notebooklm               # strict mock of the notebooklm-py 0.8.2 CLI surface the scripts use
 ├── install/
 │   ├── install.sh                   # automated installer (Linux / macOS)
 │   ├── install.ps1                  # automated installer (Windows / PowerShell)
@@ -187,6 +192,13 @@ notebooklm-kb-system/
     ├── FAQ.md                       # expanded FAQ
     └── AUTH-RESILIENCE.md           # keep browser-session auth from failing silently
 ```
+
+**Tests:** `bash tests/run.sh` (needs `bash` + `jq`, no network) drives `research.sh` and
+`healthcheck.sh` against a strict mock of the CLI — count-before/after, polling, timeouts,
+the alert/cooldown/re-auth cascade — and checks the scripts call the CLI in the shape
+notebooklm-py 0.8.2 accepts. Point `NOTEBOOKLM_REAL_CLI` at a notebooklm-py install (or have
+`notebooklm` on `PATH`) and it also runs the same commands against the real CLI with an empty
+`HOME`: they must fail on auth (rc 1), never on argument parsing (rc 2).
 
 ---
 
@@ -283,8 +295,8 @@ per-session token tax.
 Run `~/.kb/research.sh <NOTEBOOK_ID> "<an extensive, context-rich question>" fast` (or `deep`).
 NotebookLM performs the search-and-ingest on Google's infrastructure and saves the results as
 sources in the notebook; the wrapper re-lists the sources to *verify* the import actually
-happened (it never trusts the exit code). You then read the result with `kb ask` or
-`kb source fulltext`.
+happened (it never trusts the exit code). You then read the result with
+`notebooklm ask -n <NOTEBOOK_ID> "<question>"` or `notebooklm source fulltext -n <NOTEBOOK_ID> <SOURCE_ID>`.
 
 **How much can this save vs a multi-agent research workflow?**
 For broad, multi-source recon, roughly **99%**. A measured 52-agent fan-out cost about
@@ -310,14 +322,15 @@ fact-checking), and research is async with minute-scale latency. Use it as a pip
 gathering, then have the agent verify the load-bearing claims.
 
 **Is this an official Google or NotebookLM product?**
-No. It's an independent, open-source (AGPL-3.0) workflow built on top of a `notebooklm` CLI.
-It isn't affiliated with, endorsed by, or supported by Google or NotebookLM.
+No. It's an independent, open-source (AGPL-3.0) workflow built on top of the unofficial
+`notebooklm-py` CLI by Teng Lin (<https://github.com/teng-lin/notebooklm-py>, MIT); tested with
+notebooklm-py 0.8.2. It isn't affiliated with, endorsed by, or supported by Google or NotebookLM.
 
 ---
 
-## Part of the ferinazumaDEV ecosystem
+## Part of a wider set of open tools
 
-This is one project in a wider body of open tools by ferinazumaDEV. It's the practical companion
+This is one project in a wider body of open tools by Fernando Aporta Franco. It's the practical companion
 to maintaining a **citable, machine-readable corpus**: a knowledge system that keeps an agent's
 reference material structured, queryable, and cheap to pull — the same discipline that Generative
 Engine Optimization (GEO) asks of any content you want AI answer engines to find and quote.
@@ -335,7 +348,7 @@ By [ferinazumaDEV](https://github.com/ferinazumaDEV).
 
 Licensed under the **GNU Affero General Public License v3.0 (AGPL-3.0)** — see [LICENSE](LICENSE).
 
-Copyright (C) 2026 Fernando
+Copyright (C) 2026 Fernando Aporta Franco
 
 **What this means:** you may use, study, modify and share this software freely, but **if you distribute it — or run a modified version as a network service (SaaS) — you must release your complete corresponding source code under the same AGPL-3.0 terms.** It cannot be taken closed-source. This is deliberate: the project is public to be shared, not made proprietary.
 

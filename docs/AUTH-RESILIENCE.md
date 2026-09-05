@@ -25,7 +25,10 @@ and it's exactly the trap the first version of this doc fell into.
 
 2. **The device-bound tokens (days) — the one a keepalive can't touch.** Modern Google
    sessions are also held up by **device-bound credentials** (Google's **DBSC** — Device Bound
-   Session Credentials — and the refresh-token family). These are cryptographically tied to a
+   Session Credentials; primary source: the W3C/Chrome explainer
+   <https://github.com/w3c/webappsec-dbsc>, Chrome docs
+   <https://developer.chrome.com/docs/web-platform/device-bound-session-credentials> — and the
+   refresh-token family). These are cryptographically tied to a
    **device key** that lives inside the browser profile, and they can only be renewed by **a
    real browser proving possession of that key**. A POST-based keepalive (`auth refresh` just
    rotates the cookie jar over HTTP) *cannot* produce that proof — so the refresh tokens

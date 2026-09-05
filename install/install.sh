@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Copyright (C) 2026 Fernando — Licensed under AGPL-3.0 (see LICENSE).
+# Copyright (C) 2026 Fernando Aporta Franco — Licensed under AGPL-3.0 (see LICENSE).
 # Free software with ABSOLUTELY NO WARRANTY; redistribute under the AGPL-3.0 terms.
 #
 # install.sh — one-shot setup for the NotebookLM KB System on Linux / macOS.
@@ -9,16 +9,16 @@
 # Part of the "local memory + NotebookLM notebooks" second-brain starter kit.
 #
 # What it does, in order:
-#   1. Checks you have a usable Python (3.9+).
-#   2. Creates an isolated virtualenv (default: ~/.kb-venv; --local uses ./.venv) and
+#   1. Checks you have a usable Python (3.10+).
+#   2. Creates an isolated virtualenv (default: ~/.kb/venv; --local uses ./.venv) and
 #      activates it, so the CLI + its browser automation can't clash with system Python.
-#   3. Installs the CLI WITH the browser extra:  pip install "notebooklm[browser]".
+#   3. Installs the CLI WITH its browser extras:  pip install "notebooklm-py[browser,cookies]".
 #   4. DETECTS which browser you have and picks the correct login flag:
 #        - Chrome / Chromium / Edge  ->  notebooklm login --browser chrome|chromium|msedge
 #        - only Firefox / Brave      ->  notebooklm login --browser-cookies firefox|brave
 #        - none of the above         ->  playwright install chromium, then --browser chromium
 #   5. Runs the login (skipped if you're already authenticated, unless --force-login).
-#   6. VERIFIES auth with a real, non-destructive op (notebooklm notebook list).
+#   6. VERIFIES auth with a real, non-destructive op (notebooklm list).
 #   7. Prints the next steps (create a notebook, add a source, run research).
 #
 # It is IDEMPOTENT: an existing venv is reused, pip re-runs are no-ops when satisfied, and
@@ -27,7 +27,7 @@
 # Usage:
 #   ./install.sh [--local] [--force-login] [--upgrade] [-h|--help]
 #
-#   --local         Put the venv at ./.venv (in the current directory) instead of ~/.kb-venv.
+#   --local         Put the venv at ./.venv (in the current directory) instead of ~/.kb/venv.
 #   --force-login   Re-run `notebooklm login` even if the stored session still works.
 #   --upgrade       Pass --upgrade to pip so the CLI is bumped to the newest version.
 #   -h, --help      Show this help and exit.
@@ -39,7 +39,7 @@
 #                          chrome | chromium | msedge   (uses --browser)
 #                          firefox | brave              (uses --browser-cookies)
 #
-# Requirements: bash, a Python 3.9+ interpreter, and network access for pip.
+# Requirements: bash, a Python 3.10+ interpreter, and network access for pip.
 # ---------------------------------------------------------------------------------------
 
 set -euo pipefail
@@ -64,7 +64,7 @@ REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 # ---- defaults / flag parsing ----------------------------------------------------------
 PYTHON_BIN="${PYTHON:-python3}"
-VENV_DIR="${KB_VENV:-$HOME/.kb-venv}"   # default install location for the venv
+VENV_DIR="${KB_VENV:-$HOME/.kb/venv}"   # default install location for the venv
 FORCE_LOGIN=0
 PIP_UPGRADE=()                          # becomes (--upgrade) when --upgrade is passed
 
@@ -77,7 +77,7 @@ install.sh — set up the NotebookLM KB System on Linux / macOS.
 Usage:
   ./install.sh [--local] [--force-login] [--upgrade] [-h|--help]
 
-  --local         Put the venv at ./.venv instead of ~/.kb-venv.
+  --local         Put the venv at ./.venv instead of ~/.kb/venv.
   --force-login   Re-run `notebooklm login` even if the session still works.
   --upgrade       Bump the CLI to the newest version (pip --upgrade).
   -h, --help      Show this help.
@@ -107,11 +107,11 @@ IS_MACOS=0
 step "1/6  Checking Python"
 
 command -v "$PYTHON_BIN" >/dev/null 2>&1 \
-  || die "'$PYTHON_BIN' not found. Install Python 3.9+ (macOS: 'brew install python'; Debian/Ubuntu: 'sudo apt install python3 python3-venv')."
+  || die "'$PYTHON_BIN' not found. Install Python 3.10+ (macOS: 'brew install python'; Debian/Ubuntu: 'sudo apt install python3 python3-venv')."
 
-# Require 3.9+. The interpreter itself is the most reliable version oracle.
-if ! "$PYTHON_BIN" -c 'import sys; raise SystemExit(0 if sys.version_info[:2] >= (3, 9) else 1)'; then
-  die "Python 3.9+ is required (found $("$PYTHON_BIN" -V 2>&1)). Install a newer Python or set PYTHON=/path/to/python3.x"
+# Require 3.10+ (notebooklm-py declares Requires-Python >=3.10). The interpreter itself is the most reliable version oracle.
+if ! "$PYTHON_BIN" -c 'import sys; raise SystemExit(0 if sys.version_info[:2] >= (3, 10) else 1)'; then
+  die "Python 3.10+ is required (found $("$PYTHON_BIN" -V 2>&1)). Install a newer Python or set PYTHON=/path/to/python3.x"
 fi
 ok "Using $("$PYTHON_BIN" -V 2>&1) at $(command -v "$PYTHON_BIN")"
 
@@ -147,19 +147,20 @@ python -m ensurepip --upgrade >/dev/null 2>&1 || true
 python -m pip install --quiet --upgrade pip >/dev/null 2>&1 || warn "could not upgrade pip (continuing)"
 
 # =======================================================================================
-# 3. Install the CLI  (WITH the browser extra — needed for login + research)
+# 3. Install the CLI  (WITH the browser extras — needed for login + research)
 # =======================================================================================
-step "3/6  Installing notebooklm[browser]"
+step "3/6  Installing notebooklm-py[browser,cookies]"
 
 # The [browser] extra is the optional dependency group that enables the browser-backed
-# flows (interactive login, headless re-auth, deep research). Plain `notebooklm` fails
-# at login/research later, so we always install the extra.
+# flows (interactive login, headless re-auth, deep research); [cookies] is what
+# `login --browser-cookies` (the Firefox/Brave path below) needs. Plain `notebooklm-py`
+# fails at login/research later, so we always install both extras.
 if command -v notebooklm >/dev/null 2>&1 && [ "${#PIP_UPGRADE[@]}" -eq 0 ]; then
-  log "notebooklm already installed — ensuring the [browser] extra is satisfied ..."
+  log "notebooklm already installed — ensuring the [browser,cookies] extras are satisfied ..."
 fi
 # Note: ${PIP_UPGRADE[@]+"..."} expands to nothing when the array is empty WITHOUT
 # tripping `set -u` on old bash (macOS ships 3.2, where a bare "${empty[@]}" errors).
-python -m pip install ${PIP_UPGRADE[@]+"${PIP_UPGRADE[@]}"} "notebooklm[browser]" \
+python -m pip install ${PIP_UPGRADE[@]+"${PIP_UPGRADE[@]}"} "notebooklm-py[browser,cookies]" \
   || die "pip install failed. Check your network / proxy and retry."
 
 command -v notebooklm >/dev/null 2>&1 \
@@ -239,7 +240,7 @@ fi
 step "5/6  Authenticating"
 
 # is_authed: true when a real, non-destructive op succeeds — proof the session is valid.
-is_authed() { notebooklm notebook list >/dev/null 2>&1; }
+is_authed() { notebooklm list >/dev/null 2>&1; }
 
 if [ "$FORCE_LOGIN" = "0" ] && is_authed; then
   ok "Already authenticated (a stored session is valid) — skipping login. Use --force-login to redo it."
@@ -272,7 +273,7 @@ fi
 step "6/6  Verifying"
 
 if is_authed; then
-  ok "Auth verified — 'notebooklm notebook list' succeeded."
+  ok "Auth verified — 'notebooklm list' succeeded."
 else
   die "Auth check failed after login. Re-run this script (or 'notebooklm login ${LOGIN_FLAGS[*]}') and complete the sign-in."
 fi
@@ -295,11 +296,11 @@ refresh their own session (deep research needs this):
     # persist it, e.g.:  echo 'export NOTEBOOKLM_HEADLESS_REAUTH=1' >> ~/.bashrc   (or ~/.zshrc)
 
 ${C_BOLD}Create your first notebook and add a source:${C_RST}
-    notebooklm notebook create "infra"           # note the <NOTEBOOK_ID> it prints
+    notebooklm create "infra"           # note the <NOTEBOOK_ID> it prints
     mkdir -p ~/.kb/build
     printf '# infra\\n\\nFirst notes.\\n' > ~/.kb/build/infra__architecture.md
-    notebooklm source add <NOTEBOOK_ID> ~/.kb/build/infra__architecture.md
-    notebooklm source list <NOTEBOOK_ID>          # wait until it shows "ready"
+    notebooklm source add -n <NOTEBOOK_ID> ~/.kb/build/infra__architecture.md
+    notebooklm source list -n <NOTEBOOK_ID>          # wait until it shows "ready"
 
 ${C_BOLD}Record the friendly-key -> id map${C_RST} in ~/.kb/notebooks.json:
     { "infra": "<NOTEBOOK_ID>", "apps": "<NOTEBOOK_ID>", "ops": "<NOTEBOOK_ID>" }
@@ -311,7 +312,7 @@ ${C_BOLD}Copy the kit's docs + templates into your install${C_RST} (from the rep
     cp "$REPO_ROOT/research.sh" ~/.kb/ && chmod +x ~/.kb/research.sh
 
 ${C_BOLD}Ask a question (cheap, non-destructive) and run web research:${C_RST}
-    notebooklm ask <NOTEBOOK_ID> "<an extensive, context-rich question>"
+    notebooklm ask -n <NOTEBOOK_ID> "<an extensive, context-rich question>"
     ~/.kb/research.sh <NOTEBOOK_ID> "<research topic>" fast   # quick sweep
     ~/.kb/research.sh <NOTEBOOK_ID> "<research topic>" deep   # broad, multi-source
 

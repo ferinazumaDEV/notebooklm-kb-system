@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Copyright (C) 2026 Fernando — Licensed under AGPL-3.0 (see LICENSE).
+# Copyright (C) 2026 Fernando Aporta Franco — Licensed under AGPL-3.0 (see LICENSE).
 # Free software with ABSOLUTELY NO WARRANTY; redistribute under the AGPL-3.0 terms.
 #
 # research.sh — feeds a NotebookLM notebook with fresh web research and then PROVES it was saved.
@@ -46,12 +46,18 @@
 # Requirements: bash, jq and the `notebooklm` CLI on the PATH.
 #
 # ---- ADAPT IT HERE --------------------------------------------------------------------
-# This script assumes the following CLI shape. If your CLI differs, change the two
-# list_sources() invocations and the main block below to match:
-#   notebooklm source add-research <NOTEBOOK_ID> "<query>" --from web --import-all [--deep]
-#   notebooklm source list         <NOTEBOOK_ID> --json
+# This script assumes the following CLI shape, tested against notebooklm-py 0.8.2 (the
+# `notebooklm-py` distribution the installers pull in; the PyPI name `notebooklm` is a shim
+# that pins notebooklm-py>=0.8,<0.9). If your CLI differs, change list_sources() and the
+# main block below to match:
+#   notebooklm source add-research -n <NOTEBOOK_ID> --from web --import-all --mode fast|deep -- "<query>"
+#   notebooklm source list         -n <NOTEBOOK_ID> --json
+# The `--` keeps a query that happens to start with '-' from being parsed as CLI options.
 # The JSON parsing tolerates both a top-level array and an object wrapping the list, and
 # accepts either a `status` or `state` field per source, so minor schema differences don't matter.
+# Timing: notebooklm-py 0.8.2's add-research blocks for up to its own --timeout (default
+# 1800 s per phase) BEFORE this wrapper starts polling, so a deep run can legitimately take
+# far longer than KB_POLL_TIMEOUT (default 600 s), which only bounds the wait afterwards.
 # ---------------------------------------------------------------------------------------
 
 set -euo pipefail
@@ -82,6 +88,8 @@ NOTEBOOK_ID="$1"
 QUERY="$2"
 MODE="${3:-fast}"
 
+[ -n "$QUERY" ] || { echo "error: the query must not be empty" >&2; usage; }
+
 case "$MODE" in
   fast|deep) ;;
   *) echo "error: mode must be 'fast' or 'deep' (got '$MODE')" >&2; usage ;;
@@ -97,11 +105,8 @@ if [ "$MODE" = "deep" ]; then
   export NOTEBOOKLM_HEADLESS_REAUTH=1
 fi
 
-# Extra flags passed to `source add-research` depending on depth.
-RESEARCH_FLAGS=(--from web --import-all)
-if [ "$MODE" = "deep" ]; then
-  RESEARCH_FLAGS+=(--deep)
-fi
+# Flags passed to `source add-research`. Depth goes through --mode (0.8.2 has no --deep).
+RESEARCH_FLAGS=(--from web --import-all --mode "$MODE")
 
 # ---- JSON helpers ---------------------------------------------------------------------
 # The CLI may emit a human-readable preamble (e.g. a line like "Matched: <notebook>")
@@ -119,7 +124,7 @@ JQ_NORMALIZE='(if type=="array" then . else (.sources // .items // .data // []) 
 # script: returns "[]" on any error so the caller decides what an empty list means).
 list_sources() {
   local raw
-  raw="$("$CLI" source list "$NOTEBOOK_ID" --json 2>/dev/null | strip_preamble)" || true
+  raw="$("$CLI" source list -n "$NOTEBOOK_ID" --json 2>/dev/null | strip_preamble)" || true
   if [ -z "$raw" ]; then
     printf '[]'
     return 0
@@ -149,7 +154,8 @@ echo ">> [$MODE] researching \"$QUERY\" in notebook $NOTEBOOK_ID (baseline: $bef
 # We record the exit code for the log only. The proof of success comes from re-listing the
 # sources below, NOT from this return value.
 set +e
-"$CLI" source add-research "$NOTEBOOK_ID" "$QUERY" "${RESEARCH_FLAGS[@]}"
+# `--` ends option parsing so a query beginning with '-' is never read as a CLI flag.
+"$CLI" source add-research -n "$NOTEBOOK_ID" "${RESEARCH_FLAGS[@]}" -- "$QUERY"
 add_rc=$?
 set -e
 if [ "$add_rc" -ne 0 ]; then

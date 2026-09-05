@@ -51,17 +51,18 @@ What happens:
    and after and reports the number actually added (the last line of stdout is that integer).
    The underlying CLI can exit `0` even when nothing was imported (network blip, empty results,
    degraded auth, an async job that never finished), so verification is built in.
-3. You then read the material back with `kb ask <KEY> "<question>"` or, for the raw text,
-   `kb source fulltext <KEY> <SOURCE_ID>` — **not** `artifact export`, which returns a
-   rendered/summary object rather than usable text.
+3. You then read the material back with `notebooklm ask -n <NOTEBOOK_ID> "<question>"` or, for
+   the raw text, `notebooklm source fulltext -n <NOTEBOOK_ID> <SOURCE_ID>` — **not**
+   `artifact export`, which returns a rendered/summary object rather than usable text.
 
 Ask with long, specific questions. NotebookLM answers a well-framed question far better than a
 keyword — include what you're doing, what you already know, and what you need out of it.
 
 ## What's the difference between `fast` and `deep` research?
 
-- **fast** — a quick, shallow sweep. No extra login needed. Capped at roughly **~10 sources** —
-  good for a first pass, not exhaustive coverage.
+- **fast** — a quick, shallow sweep. No extra login needed.
+  Capped at roughly **~10 sources** (observed, needs-verification) — good for a first pass, not
+  exhaustive coverage.
 - **deep** — a broader, multi-source pass. It drives a real browser session, so it needs the
   one-time headless re-auth setup below. `research.sh deep` also exports
   `NOTEBOOKLM_HEADLESS_REAUTH=1` for you so a long-running job can refresh its own auth
@@ -80,7 +81,8 @@ export NOTEBOOKLM_HEADLESS_REAUTH=1
 
 With a session seeded once and `NOTEBOOKLM_HEADLESS_REAUTH=1` set, deep research can
 re-authenticate on its own — so it fits cron jobs and server-side agents. `fast` mode needs no
-browser login at all. If deep research suddenly fails with an auth error, the stored session
+headless re-auth setup, but it still requires the one-time `notebooklm login` like every other
+command. If deep research suddenly fails with an auth error, the stored session
 expired: re-run `notebooklm login` once to reseed it and carry on.
 
 ## How much can this save vs a multi-agent research workflow? (reduce agent token cost)
@@ -96,7 +98,7 @@ Google's infrastructure, so the agent only pays to read the compact, cited resul
 | What you get | faithful, cited synthesis of the corpus | a synthesized report |
 
 That's roughly **1.9M → ~5K agent tokens, about a 99% reduction** for a broad recon — and the
-savings compound: re-querying an existing notebook with `kb ask` is a few-K-token read forever,
+savings compound: re-querying an existing notebook with `notebooklm ask` is a few-K-token read forever,
 versus re-running the whole recon. (These are order-of-magnitude figures; plug in your own token
 rates for cost.)
 
@@ -123,10 +125,10 @@ build-doc changes nothing until you re-upload. Always **add new → wait for "re
 old**:
 
 ```bash
-$EDITOR ~/.kb/build/<KEY>__<topic>.md     # 1. edit the build-doc
-kb source add <KEY> ~/.kb/build/<KEY>__<topic>.md   # 2. upload the new version
-kb source list <KEY>                       # 3. wait until it shows "ready"
-kb source delete <KEY> <OLD_SOURCE_ID>     # 4. only then remove the stale one
+$EDITOR ~/.kb/build/<KEY>__<topic>.md                                # 1. edit the build-doc
+notebooklm source add -n <NOTEBOOK_ID> ~/.kb/build/<KEY>__<topic>.md  # 2. upload the new version
+notebooklm source list -n <NOTEBOOK_ID>                               # 3. wait until it shows "ready"
+notebooklm source delete -n <NOTEBOOK_ID> <OLD_SOURCE_ID>             # 4. only then remove the stale one
 ```
 
 Never delete first: if the upload fails you're left with an empty notebook, and a notebook at
@@ -146,13 +148,15 @@ with worked examples is in [Knowledge routing](KNOWLEDGE-ROUTING.md).
 ## Is this an official Google or NotebookLM product?
 
 No. It's an independent, open-source project (AGPL-3.0) that builds a memory-and-research
-workflow on top of a `notebooklm` CLI. It is not affiliated with, endorsed by, or supported by
+workflow on top of the unofficial `notebooklm-py` CLI by Teng Lin
+(<https://github.com/teng-lin/notebooklm-py>, MIT); tested with notebooklm-py 0.8.2. It is not
+affiliated with, endorsed by, or supported by
 Google or NotebookLM. NotebookLM is a product of Google; this repo is a separate community tool.
 
 ## What do I need to install it?
 
 `bash`, `jq`, and the `notebooklm` CLI on your `PATH`; the automated installer builds an
-isolated `~/.kb/` virtualenv, installs `notebooklm[browser]`, and auto-detects a browser you
+isolated `~/.kb/` virtualenv, installs `notebooklm-py[browser,cookies]`, and auto-detects a browser you
 already have (Chrome / Edge / Brave / Firefox) — you don't need to install a specific browser
 just for this. See [Installation](../README.md#installation) for the automated scripts and the
 step-by-step guides per terminal.

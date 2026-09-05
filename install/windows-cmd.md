@@ -13,6 +13,10 @@ environment-variable syntax that CMD actually uses.
 > Everything here uses placeholders — `<YOUR_EMAIL>`, `<NOTEBOOK_ID>`, `%USERPROFILE%\.kb`.
 > Put your real values only in your local install, never in anything you publish.
 
+The `notebooklm` commands below are tested with **notebooklm-py 0.8.2**. They pass the notebook
+explicitly with `-n <NOTEBOOK_ID>`; run `notebooklm use <NOTEBOOK_ID>` once to set a current
+notebook and you can omit `-n`.
+
 Throughout, `%USERPROFILE%` is your home folder (e.g. `C:\Users\you`), and the install lives
 in `%USERPROFILE%\.kb` — the Windows equivalent of the `~/.kb/` used elsewhere in the docs.
 
@@ -21,7 +25,7 @@ in `%USERPROFILE%\.kb` — the Windows equivalent of the `~/.kb/` used elsewhere
 ## 0. Prerequisites
 
 - **Windows 10 or 11** with **Command Prompt** (`cmd.exe`).
-- **Python 3.9+**. If you don't have it, install from
+- **Python 3.10+**. If you don't have it, install from
   [python.org](https://www.python.org/downloads/windows/) and **tick "Add python.exe to
   PATH"** in the installer. Windows ships the `py` launcher with it, which this guide uses.
 - A **Google account** that can open NotebookLM.
@@ -74,13 +78,14 @@ To leave the venv later, just run `deactivate`.
 With the venv active:
 
 ```bat
-pip install "notebooklm[browser]"
+pip install "notebooklm-py[browser,cookies]"
 ```
 
 The `[browser]` extra is the optional dependency group that enables every browser-backed
-flow: interactive login, headless re-auth, and deep research. Plain `pip install notebooklm`
-gives you a CLI that can `ask` but **fails at login and research** — install the extra now to
-avoid that confusing half-working state later.
+flow: interactive login, headless re-auth, and deep research; the `[cookies]` extra is what
+`notebooklm login --browser-cookies ...` (the Firefox/Brave path in §3) needs. Plain
+`pip install notebooklm-py` gives you a CLI that can `ask` but **fails at login and research**
+— install the extras now to avoid that confusing half-working state later.
 
 Confirm it landed:
 
@@ -183,15 +188,15 @@ Create one notebook per **domain** (e.g. `infra`, `apps`, `ops`) — prefer a fe
 notebooks over many tiny ones.
 
 ```bat
-notebooklm notebook create "infra"
+notebooklm create "infra"
 :: -> prints: created notebook <NOTEBOOK_ID>   (copy that id)
 ```
 
 Upload a local Markdown/text file as a **source** (sources are what queries actually read):
 
 ```bat
-notebooklm source add <NOTEBOOK_ID> "%USERPROFILE%\.kb\build\infra__architecture.md"
-notebooklm source list <NOTEBOOK_ID>
+notebooklm source add -n <NOTEBOOK_ID> "%USERPROFILE%\.kb\build\infra__architecture.md"
+notebooklm source list -n <NOTEBOOK_ID>
 :: wait until the source shows "ready" before querying it
 ```
 
@@ -229,13 +234,13 @@ A quick end-to-end sanity check, all from CMD:
 notebooklm --version
 
 :: 2. auth works and the notebook exists (lists your notebooks)
-notebooklm notebook list
+notebooklm list
 
 :: 3. the source ingested (look for "ready")
-notebooklm source list <NOTEBOOK_ID>
+notebooklm source list -n <NOTEBOOK_ID>
 
 :: 4. a real query returns a grounded answer
-notebooklm ask <NOTEBOOK_ID> "Summarize what this notebook currently covers, in 3 bullets."
+notebooklm ask -n <NOTEBOOK_ID> "Summarize what this notebook currently covers, in 3 bullets."
 ```
 
 If `ask` returns a grounded answer, the install is good. If step 2 or 4 fails with an auth
@@ -274,20 +279,20 @@ automatic verification, so **verify manually** afterwards:
 set NOTEBOOKLM_HEADLESS_REAUTH=1
 
 :: fast pass
-notebooklm source add-research <NOTEBOOK_ID> "<research question or topic>" --from web --import-all
+notebooklm source add-research -n <NOTEBOOK_ID> "<research question or topic>" --from web --import-all --mode fast
 
-:: deep pass (add --deep)
-notebooklm source add-research <NOTEBOOK_ID> "<research question or topic>" --from web --import-all --deep
+:: deep pass (--mode deep)
+notebooklm source add-research -n <NOTEBOOK_ID> "<research question or topic>" --from web --import-all --mode deep
 
 :: VERIFY it actually imported — the count should have gone up, and the new source "ready"
-notebooklm source list <NOTEBOOK_ID>
+notebooklm source list -n <NOTEBOOK_ID>
 ```
 
 Then read the imported material as **fulltext** (not an artifact export):
 
 ```bat
-notebooklm source list <NOTEBOOK_ID>
-notebooklm source fulltext <NOTEBOOK_ID> <SOURCE_ID>
+notebooklm source list -n <NOTEBOOK_ID>
+notebooklm source fulltext -n <NOTEBOOK_ID> <SOURCE_ID>
 ```
 
 > Because Option B skips the wrapper's count-before/count-after check, don't trust a clean
@@ -300,14 +305,14 @@ notebooklm source fulltext <NOTEBOOK_ID> <SOURCE_ID>
 
 - **Activate the venv in every new Command Prompt** before using the CLI:
   `"%USERPROFILE%\.kb\venv\Scripts\activate.bat"`.
-- **Query before you act.** `notebooklm ask <NOTEBOOK_ID> "<long, specific question>"` — ask
+- **Query before you act.** `notebooklm ask -n <NOTEBOOK_ID> "<long, specific question>"` — ask
   extensively; NotebookLM answers a well-framed question far better than a keyword.
 - **Editing a notebook = re-uploading the source.** The safe order is **add-new →
   wait-ready → delete-old** (never delete first, never leave a notebook with 0 sources):
   ```bat
-  notebooklm source add <NOTEBOOK_ID> "%USERPROFILE%\.kb\build\<key>__<topic>.md"
-  notebooklm source list <NOTEBOOK_ID>            :: wait for "ready"
-  notebooklm source delete <NOTEBOOK_ID> <OLD_SOURCE_ID>
+  notebooklm source add -n <NOTEBOOK_ID> "%USERPROFILE%\.kb\build\<key>__<topic>.md"
+  notebooklm source list -n <NOTEBOOK_ID>            :: wait for "ready"
+  notebooklm source delete -n <NOTEBOOK_ID> <OLD_SOURCE_ID>
   ```
 - The full runbook (paths, gotchas, dedup, maintenance) is in
   `%USERPROFILE%\.kb\OPERATIONS.md`; the routing rule is in `KNOWLEDGE-ROUTING.md`.
@@ -332,7 +337,7 @@ Every line that differs between the two Windows shells:
 | Comment in a script | `:: comment` (or `rem`) | `# comment` |
 | Find a command | `where notebooklm` | `Get-Command notebooklm` |
 
-Everything else — `pip install "notebooklm[browser]"`, `playwright install chromium`, and all
+Everything else — `pip install "notebooklm-py[browser,cookies]"`, `playwright install chromium`, and all
 the `notebooklm ...` subcommands — is **identical** in both shells.
 
 ---

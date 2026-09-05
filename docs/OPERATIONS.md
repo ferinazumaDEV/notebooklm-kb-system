@@ -13,8 +13,10 @@ This document is the operating manual for maintaining that system: how the piece
 how to read from a notebook, how to write to one correctly, how to run research on the
 web, and the traps that will bite you if you skip a step.
 
-All commands below assume a CLI wrapper on your `PATH`. Adjust names/paths to your
-installation. Placeholders like `<NOTEBOOK_ID>`, `<YOUR_EMAIL>`, `<KEY>` and `~/.kb/`
+All commands below assume a CLI wrapper on your `PATH`: `kb`/`nb` stand for a tiny wrapper
+you write that maps a key to a notebook id via `notebooks.json` and calls
+`notebooklm ... -n <NOTEBOOK_ID>`; it is not included in this repo. Adjust names/paths to
+your installation. Placeholders like `<NOTEBOOK_ID>`, `<YOUR_EMAIL>`, `<KEY>` and `~/.kb/`
 stand for your own values.
 
 ---
@@ -166,22 +168,21 @@ integrate it into a notebook — useful for topics that move faster than your bu
 this through the research helper rather than by hand:
 
 ```bash
-~/.kb/research.sh "<research question or topic>"
-# optional flags the script forwards, e.g.:
-~/.kb/research.sh --mode fast "<topic>"
-~/.kb/research.sh --mode deep --into <KEY> "<topic>"
+~/.kb/research.sh <NOTEBOOK_ID> "<research question or topic>" fast
+~/.kb/research.sh <NOTEBOOK_ID> "<research question or topic>" deep
 ```
 
 There are two modes:
 
-- **fast** — a quick, shallow gather. No extra login. **Capped at roughly ~10
-  sources** — good for a first sweep, not for exhaustive coverage.
+- **fast** — a quick, shallow gather. No extra login.
+  **Capped at roughly ~10 sources** (observed, needs-verification) — good for a first sweep,
+  not for exhaustive coverage.
 - **deep** — broader, multi-source research. Requires the headless-reauth setup
   below (see §5) because it drives a real browser session.
 
-`research.sh` wraps the underlying tool, applies your defaults, and (when `--into` is given)
-hands the results to a notebook. Keep your settings in the script so the caller
-doesn't have to remember flags.
+`research.sh` wraps the underlying tool and applies your defaults. It takes the notebook id
+directly — map a key to its id yourself via `notebooks.json`. Keep your settings in the
+script so the caller doesn't have to remember flags.
 
 ### Reading research results — `source fulltext`, not `artifact export`
 
@@ -204,13 +205,15 @@ Deep research drives a real browser and therefore needs a valid, refreshable log
 that works without a visible window. Set this up once per machine.
 
 ```bash
-# 1. Install the browser automation library and its browser binaries.
-pip install playwright
-playwright install            # or: playwright install chromium
+# 1. Install the CLI with its browser extras. [browser] already pins Playwright
+#    (no separate `pip install playwright`); [cookies] is needed for
+#    `login --browser-cookies` (Firefox/Brave).
+pip install "notebooklm-py[browser,cookies]"
 
-# 2. Install the tool's browser extra (the optional dependency group that
-#    enables browser-backed / deep flows).
-pip install "notebooklm[browser]"
+# 2. ONLY if you have no system Chrome / Chromium / Edge for Playwright to drive:
+#    download Playwright's own Chromium (a bare `playwright install` would pull
+#    several browsers). install/install.sh does the same check.
+playwright install chromium
 
 # 3. Log in ONCE, interactively, to seed the stored session/cookies.
 notebooklm login
@@ -232,8 +235,9 @@ re-run `notebooklm login` once (interactively) to reseed it, and carry on.
 
 ## 6. Known gotchas
 
-- **Fast research is capped at ~10 sources.** It's a first sweep, not full coverage. If
-  you need breadth, use deep — and expect to run several passes and deduplicate.
+- **Fast research is capped at ~10 sources** (observed, needs-verification). It's a first
+  sweep, not full coverage. If you need breadth, use deep — and expect to run several passes
+  and deduplicate.
 - **Deep research needs the headless-reauth setup (§5).** Without the browser extra,
   a seeded `notebooklm login`, and `NOTEBOOKLM_HEADLESS_REAUTH=1`, deep runs fail to
   authenticate. This is the most common "it worked yesterday" failure.
@@ -272,12 +276,12 @@ kb source list <KEY>                             # wait until new one is ready
 kb source delete <KEY> <OLD_SOURCE_ID>           # remove stale source
 
 # RESEARCH
-~/.kb/research.sh "<topic>"                       # fast (~10 source cap)
-~/.kb/research.sh --mode deep --into <KEY> "<topic>"   # deep (needs §5)
+~/.kb/research.sh <NOTEBOOK_ID> "<topic>" fast   # ~10-source cap (observed, needs-verification)
+~/.kb/research.sh <NOTEBOOK_ID> "<topic>" deep   # deep (needs §5)
 
 # ONE-TIME DEEP SETUP
-pip install playwright && playwright install
-pip install "notebooklm[browser]"
+pip install "notebooklm-py[browser,cookies]"
+playwright install chromium                      # only if no system Chrome/Chromium/Edge
 notebooklm login
 export NOTEBOOKLM_HEADLESS_REAUTH=1
 

@@ -7,6 +7,10 @@ lines to your package manager.
 Every value in angle brackets is a placeholder for your own: `<YOUR_EMAIL>`,
 `<NOTEBOOK_ID>`, `<SOURCE_ID>`. Don't paste real secrets into any file you commit.
 
+The `notebooklm` commands below are tested with **notebooklm-py 0.8.2**. They pass the notebook
+explicitly with `-n <NOTEBOOK_ID>`; run `notebooklm use <NOTEBOOK_ID>` once to set a current
+notebook and you can omit `-n`.
+
 > **Two kinds of machine.** A **desktop** (has a graphical display) can run the one-time
 > interactive `notebooklm login` directly. A **headless server** (no display — a VPS, a
 > box you only reach over SSH) cannot pop a browser window, so it needs a slightly
@@ -19,7 +23,7 @@ Every value in angle brackets is a placeholder for your own: `<YOUR_EMAIL>`,
 
 1. Install prerequisites with `apt` (`python3-venv`, `pip`, `jq`)
 2. Create and activate a virtualenv
-3. Install the CLI: `pip install "notebooklm[browser]"`
+3. Install the CLI: `pip install "notebooklm-py[browser,cookies]"`
 4. Install a Playwright browser + its system libraries
 5. Detect which browser you have and run `notebooklm login` with the right flag
    (desktop in §5.2, headless server in §5.3)
@@ -31,7 +35,7 @@ Every value in angle brackets is a placeholder for your own: `<YOUR_EMAIL>`,
 
 ## 1. Install prerequisites (apt)
 
-You need Python 3.9+ with the **venv** and **pip** modules (Debian/Ubuntu split these into
+You need Python 3.10+ with the **venv** and **pip** modules (Debian/Ubuntu split these into
 separate packages), plus `jq` (used by `research.sh` to parse the CLI's JSON).
 
 ```bash
@@ -42,7 +46,7 @@ sudo apt-get install -y python3 python3-venv python3-pip jq
 Confirm the versions:
 
 ```bash
-python3 --version        # -> Python 3.9 or newer
+python3 --version        # -> Python 3.10 or newer
 jq --version             # -> jq-1.x
 ```
 
@@ -81,20 +85,21 @@ To leave the venv later: `deactivate`.
 ## 3. Install the CLI (with the browser extra)
 
 ```bash
-pip install "notebooklm[browser]"
+pip install "notebooklm-py[browser,cookies]"
 ```
 
 > The `[browser]` extra is the optional dependency group that enables the browser-backed
-> flows: **interactive login, headless re-auth, and deep research**. Plain
-> `pip install notebooklm` gives you only the bare CLI and will fail at login/research
-> later. Install the extra now to avoid a confusing "works for ask, fails for research"
-> state.
+> flows: **interactive login, headless re-auth, and deep research**; the `[cookies]` extra
+> is what `notebooklm login --browser-cookies ...` (the Firefox/Brave path in §5) needs.
+> Plain `pip install notebooklm-py` gives you only the bare CLI and will fail at
+> login/research later. Install the extras now to avoid a confusing "works for ask, fails
+> for research" state.
 
 Confirm the CLI is on your PATH (it lives in the venv you just activated):
 
 ```bash
 notebooklm --version
-notebooklm --help          # lists the available verbs (notebook / source / ask / login)
+notebooklm --help          # lists the available verbs (list / create / source / ask / login)
 ```
 
 ---
@@ -260,11 +265,11 @@ Confirm auth actually works by hitting the service — listing your notebooks is
 non-destructive:
 
 ```bash
-notebooklm notebook list
+notebooklm list
 ```
 
 If that returns without an auth error, you're set. (If your build names the verb
-differently, `notebooklm --help` shows the exact subcommands — `notebook create` in §7 is
+differently, `notebooklm --help` shows the exact subcommands — `create` in §7 is
 an equally good live check.)
 
 ---
@@ -276,7 +281,7 @@ notebooks over many tiny ones.
 
 ```bash
 # Create a notebook; note the id it prints back.
-notebooklm notebook create "infra"
+notebooklm create "infra"
 #   -> created notebook <NOTEBOOK_ID>
 
 # Prepare a build-doc (the local file you edit; the notebook reads the uploaded copy).
@@ -284,10 +289,10 @@ mkdir -p ~/.kb/build
 printf '# infra\n\nFirst notes.\n' > ~/.kb/build/infra__architecture.md
 
 # Upload it as a SOURCE (what queries actually read).
-notebooklm source add <NOTEBOOK_ID> ~/.kb/build/infra__architecture.md
+notebooklm source add -n <NOTEBOOK_ID> ~/.kb/build/infra__architecture.md
 
 # Confirm it ingested — wait until the source shows "ready".
-notebooklm source list <NOTEBOOK_ID>
+notebooklm source list -n <NOTEBOOK_ID>
 ```
 
 Record the friendly-key → id mapping so you never paste a raw UUID again. Create
@@ -300,11 +305,11 @@ Record the friendly-key → id mapping so you never paste a raw UUID again. Crea
 Ask it a question (the cheap, common operation — reading never changes the corpus):
 
 ```bash
-notebooklm ask <NOTEBOOK_ID> "<an extensive, context-rich question about your infra>"
+notebooklm ask -n <NOTEBOOK_ID> "<an extensive, context-rich question about your infra>"
 ```
 
 > **Editing a source later** means re-uploading it: edit the build-doc, `source add` the
-> new version, wait until it's **ready**, then `source delete <NOTEBOOK_ID> <OLD_SOURCE_ID>`
+> new version, wait until it's **ready**, then `source delete -n <NOTEBOOK_ID> <OLD_SOURCE_ID>`
 > — always add-new → wait-ready → delete-old, so a notebook is never left at 0 sources.
 > See `docs/OPERATIONS.md` §3.
 
@@ -340,8 +345,8 @@ source ~/.kb/venv/bin/activate      # if not already active
 Read the imported material back with **fulltext**, not an artifact export:
 
 ```bash
-notebooklm source list <NOTEBOOK_ID>                    # find the new source id
-notebooklm source fulltext <NOTEBOOK_ID> <SOURCE_ID>    # the raw, usable text
+notebooklm source list -n <NOTEBOOK_ID>                    # find the new source id
+notebooklm source fulltext -n <NOTEBOOK_ID> <SOURCE_ID>    # the raw, usable text
 ```
 
 ---
@@ -353,7 +358,7 @@ notebooklm source fulltext <NOTEBOOK_ID> <SOURCE_ID>    # the raw, usable text
 - **`python3 -m venv` fails with "ensurepip is not available"** — `python3-venv` isn't
   installed. Run the §1 `apt-get install` line.
 - **`playwright: command not found`** — the venv isn't active, or the `[browser]` extra
-  wasn't installed. Re-activate the venv and re-run `pip install "notebooklm[browser]"`.
+  wasn't installed. Re-activate the venv and re-run `pip install "notebooklm-py[browser,cookies]"`.
 - **Chromium launches but immediately errors about a missing `.so` library** — the system
   libraries aren't installed. Run `sudo ~/.kb/venv/bin/playwright install-deps chromium`
   (§4).
@@ -368,7 +373,7 @@ notebooklm source fulltext <NOTEBOOK_ID> <SOURCE_ID>    # the raw, usable text
 - **`research.sh: Permission denied`** — it isn't executable. Run
   `chmod +x ~/.kb/research.sh`.
 - **`jq: command not found`** — install it: `sudo apt-get install -y jq` (§1).
-- **Research seems to do nothing** — confirm auth (`notebooklm notebook list`), then
+- **Research seems to do nothing** — confirm auth (`notebooklm list`), then
   re-list sources; the async import can take minutes. `research.sh` already waits and
   verifies, and fails loudly if nothing imported.
 
@@ -382,7 +387,7 @@ sudo apt-get update && sudo apt-get install -y python3 python3-venv python3-pip 
 mkdir -p ~/.kb && python3 -m venv ~/.kb/venv
 source ~/.kb/venv/bin/activate
 python -m pip install --upgrade pip
-pip install "notebooklm[browser]"
+pip install "notebooklm-py[browser,cookies]"
 playwright install chromium
 sudo ~/.kb/venv/bin/playwright install-deps chromium
 
@@ -397,11 +402,11 @@ echo 'export NOTEBOOKLM_HEADLESS_REAUTH=1' >> ~/.bashrc   # servers + deep runs
 source ~/.kb/venv/bin/activate
 
 # Daily
-notebooklm notebook list
-notebooklm ask <NOTEBOOK_ID> "<long, contextual question>"
-notebooklm source add <NOTEBOOK_ID> ~/.kb/build/<key>__<topic>.md
-notebooklm source list <NOTEBOOK_ID>
-notebooklm source fulltext <NOTEBOOK_ID> <SOURCE_ID>
+notebooklm list
+notebooklm ask -n <NOTEBOOK_ID> "<long, contextual question>"
+notebooklm source add -n <NOTEBOOK_ID> ~/.kb/build/<key>__<topic>.md
+notebooklm source list -n <NOTEBOOK_ID>
+notebooklm source fulltext -n <NOTEBOOK_ID> <SOURCE_ID>
 
 # Research
 cp research.sh ~/.kb/ && chmod +x ~/.kb/research.sh        # first time only

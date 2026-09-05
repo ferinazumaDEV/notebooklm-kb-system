@@ -5,9 +5,9 @@
 .DESCRIPTION
     Automates the manual flow in install/windows-powershell.md:
 
-      1. Finds a suitable Python (3.9+; 3.11+ recommended).
+      1. Finds a suitable Python (3.10+; 3.11+ recommended).
       2. Creates an isolated virtualenv under the KB root (default: $HOME\.kb\venv).
-      3. Installs the CLI with the browser extra:  pip install "notebooklm[browser]".
+      3. Installs the CLI with its browser extras:  pip install "notebooklm-py[browser,cookies]".
       4. DETECTS which browser you have (Chrome / Edge / Brave / Firefox) via the
          registry App Paths and the usual Program Files locations, and chooses the
          right login flag:
@@ -15,7 +15,7 @@
              Brave / Firefox    -> notebooklm login --browser-cookies brave|firefox
              none of the above  -> playwright install chromium, then --browser chromium
       5. Runs notebooklm login to seed the reusable session profile.
-      6. Verifies auth with a real, non-destructive call (notebooklm notebook list).
+      6. Verifies auth with a real, non-destructive call (notebooklm list).
       7. Prints the next steps (create a notebook, add a source, run research).
 
     The script never activates the venv (which would trip PowerShell's execution
@@ -53,6 +53,9 @@
     Install only; you will log in (or copy a session profile) yourself later.
 
 .NOTES
+    Copyright (C) 2026 Fernando Aporta Franco — Licensed under AGPL-3.0 (see LICENSE).
+    Free software with ABSOLUTELY NO WARRANTY; redistribute under the AGPL-3.0 terms.
+
     Part of the NotebookLM KB System. Placeholders only — no private data.
     See install/windows-powershell.md for the manual, step-by-step version.
 #>
@@ -154,7 +157,7 @@ function Find-Browser {
 
 # ---------------------------------------------------------------------------
 # Locate a usable Python. Prefer the Windows launcher (`py -3`, which selects the
-# newest installed 3.x), then `python`, then `python3`. Requires 3.9+.
+# newest installed 3.x), then `python`, then `python3`. Requires 3.10+.
 # Returns an object with the exe + any leading args (e.g. -3) and the version.
 # ---------------------------------------------------------------------------
 function Resolve-Python {
@@ -173,7 +176,7 @@ function Resolve-Python {
         $verStr = ("$out").Trim()
         $ver = $null
         if (-not [version]::TryParse($verStr, [ref]$ver)) { continue }
-        if ($ver -ge [version]'3.9') {
+        if ($ver -ge [version]'3.10') {
             return [pscustomobject]@{ Exe = $c.Exe; Pre = @($c.Pre); Version = $ver }
         }
     }
@@ -201,7 +204,7 @@ $playwrightExe = Join-Path $venvScripts 'playwright.exe'
 # ===========================================================================
 # 1. PYTHON
 # ===========================================================================
-Write-Step "Checking Python (need 3.9+, 3.11+ recommended)"
+Write-Step "Checking Python (need 3.10+, 3.11+ recommended)"
 $py = Resolve-Python
 if (-not $py) {
     Write-Warn2 "No suitable Python found on PATH."
@@ -209,7 +212,7 @@ if (-not $py) {
     Write-Info  "    winget install --id Python.Python.3.11 -e --source winget"
     Write-Info  "  or download from https://www.python.org/downloads/windows/"
     Write-Info  "  (tick 'Add python.exe to PATH' in the installer, then open a NEW window)."
-    throw "Python 3.9+ is required."
+    throw "Python 3.10+ is required."
 }
 Write-Ok ("Found Python {0} via '{1} {2}'" -f $py.Version, $py.Exe, ($py.Pre -join ' ')).Trim()
 if ($py.Version -lt [version]'3.11') {
@@ -239,12 +242,13 @@ else {
 }
 
 # ===========================================================================
-# 3. INSTALL THE CLI (with the browser extra)
+# 3. INSTALL THE CLI (with the browser extras)
 # ===========================================================================
-Write-Step "Installing notebooklm[browser] into the venv"
-# Upgrade pip inside the fresh venv first, then install the CLI + browser extra.
+Write-Step "Installing notebooklm-py[browser,cookies] into the venv"
+# Upgrade pip inside the fresh venv first, then install the CLI + its extras
+# ([browser] for Playwright-driven login, [cookies] for --browser-cookies).
 Invoke-Native -Exe $venvPython -Arguments @('-m', 'pip', 'install', '--upgrade', 'pip') -What "pip upgrade"
-Invoke-Native -Exe $venvPython -Arguments @('-m', 'pip', 'install', 'notebooklm[browser]') -What "pip install notebooklm[browser]"
+Invoke-Native -Exe $venvPython -Arguments @('-m', 'pip', 'install', 'notebooklm-py[browser,cookies]') -What "pip install notebooklm-py[browser,cookies]"
 
 if (-not (Test-Path $notebooklmExe)) {
     throw "Install finished but $notebooklmExe is missing — the CLI did not install correctly."
@@ -389,9 +393,9 @@ if ($EnableHeadlessReauth) {
 # 8. VERIFY WITH A REAL OPERATION
 # ===========================================================================
 if (-not $SkipLogin) {
-    Write-Step "Verifying auth (notebooklm notebook list)"
+    Write-Step "Verifying auth (notebooklm list)"
     try {
-        Invoke-Native -Exe $notebooklmExe -Arguments @('notebook', 'list') -What "notebooklm notebook list"
+        Invoke-Native -Exe $notebooklmExe -Arguments @('list') -What "notebooklm list"
         Write-Ok "Auth works — the CLI reached NotebookLM."
     }
     catch {
@@ -413,23 +417,23 @@ Write-Host @"
     (If activation is blocked: Set-ExecutionPolicy -Scope Process -ExecutionPolicy RemoteSigned)
 
     Create your first notebook and add a source:
-        notebooklm notebook create "infra"          # note the <NOTEBOOK_ID> it prints
+        notebooklm create "infra"          # note the <NOTEBOOK_ID> it prints
         New-Item -ItemType Directory -Force -Path "$KbRoot\build" | Out-Null
         Set-Content "$KbRoot\build\infra__architecture.md" "# infra`n`nFirst notes."
-        notebooklm source add <NOTEBOOK_ID> "$KbRoot\build\infra__architecture.md"
-        notebooklm source list <NOTEBOOK_ID>         # wait until it shows "ready"
+        notebooklm source add -n <NOTEBOOK_ID> "$KbRoot\build\infra__architecture.md"
+        notebooklm source list -n <NOTEBOOK_ID>         # wait until it shows "ready"
 
     Record the friendly-key -> id map in $KbRoot\notebooks.json :
         { "infra": "<NOTEBOOK_ID>", "apps": "<NOTEBOOK_ID>", "ops": "<NOTEBOOK_ID>" }
 
     Ask a question (cheap, non-destructive):
-        notebooklm ask <NOTEBOOK_ID> "<an extensive, context-rich question>"
+        notebooklm ask -n <NOTEBOOK_ID> "<an extensive, context-rich question>"
 
     Web research: research.sh is a bash script (needs bash + jq), so run it under
     Git Bash or WSL, or call the CLI directly from PowerShell:
-        notebooklm source add-research <NOTEBOOK_ID> "<topic>" --from web --import-all
+        notebooklm source add-research -n <NOTEBOOK_ID> "<topic>" --from web --import-all --mode fast
         `$env:NOTEBOOKLM_HEADLESS_REAUTH = "1"
-        notebooklm source add-research <NOTEBOOK_ID> "<topic>" --from web --import-all --deep
+        notebooklm source add-research -n <NOTEBOOK_ID> "<topic>" --from web --import-all --mode deep
 
     Full guide: install/windows-powershell.md   Concept + routing: README.md
 "@ -ForegroundColor Gray

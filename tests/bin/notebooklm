@@ -1,0 +1,80 @@
+#!/usr/bin/env bash
+#
+# Copyright (C) 2026 Fernando Aporta Franco — Licensed under AGPL-3.0 (see LICENSE).
+#
+# tests/bin/notebooklm — a STRICT mock of the notebooklm-py 0.8.2 CLI surface that
+# research.sh and healthcheck.sh use. It parses arguments the way the real CLI does
+# (notebook via -n/--notebook, no positional notebook id, --mode fast|deep, no --deep,
+# `--` ends options) and returns rc=2 on a usage error exactly like click, so a script
+# that drifts back to the old shape fails here even without the real CLI installed.
+#
+# State lives in $MOCK_DIR (set by tests/run.sh):
+#   list.<n>.json      output of the n-th `source list` call (falls back to the highest n)
+#   list.rc            exit code for `source list` (default 0)
+#   list.fixed.json    served (rc 0) once the file `fixed` exists
+#   refresh_fixes      `auth refresh` creates `fixed` (keepalive recovers auth)
+#   headless_fixes     `source list` with NOTEBOOKLM_HEADLESS_REAUTH=1 creates `fixed`
+#   MOCK_ADD_RC (env)  exit code of `source add-research` (default 0)
+# It records every invocation in all.argv, add-research calls in add.calls and the value
+# of NOTEBOOKLM_HEADLESS_REAUTH seen by add-research in env.headless.
+[ -n "${MOCK_DIR:-}" ] || { echo "mock notebooklm: MOCK_DIR must be set" >&2; exit 99; }
+printf '%s\n' "$*" >> "$MOCK_DIR/all.argv"
+usage_err() { printf 'Error: %s\n' "$1" >&2; exit 2; }
+
+cmd="${1:-}"; sub="${2:-}"
+case "$cmd" in
+  list)     exit 0 ;;
+  notebook) usage_err "No such command 'notebook'. Did you mean 'note'?" ;;
+  auth)
+    [ "$sub" = "refresh" ] || usage_err "No such command '$sub'."
+    printf '%s\n' "$*" >> "$MOCK_DIR/refresh.called"
+    [ -f "$MOCK_DIR/refresh_fixes" ] && touch "$MOCK_DIR/fixed"
+    exit 0 ;;
+  source)   ;;
+  *)        usage_err "No such command '$cmd'." ;;
+esac
+shift 2
+
+case "$sub" in
+  list)
+    nb=""
+    while [ $# -gt 0 ]; do
+      case "$1" in
+        -n|--notebook) [ $# -ge 2 ] || usage_err "Option '$1' requires an argument."; nb="$2"; shift 2 ;;
+        --json)        shift ;;
+        -*)            usage_err "No such option '$1'." ;;
+        *)             usage_err "Got unexpected extra argument ($1)" ;;
+      esac
+    done
+    [ -n "$nb" ] || { echo "No notebook selected. Use -n/--notebook or 'notebooklm use'." >&2; exit 1; }
+    if [ "${NOTEBOOKLM_HEADLESS_REAUTH:-}" = "1" ] && [ -f "$MOCK_DIR/headless_fixes" ]; then touch "$MOCK_DIR/fixed"; fi
+    n=$(( $(cat "$MOCK_DIR/list.count" 2>/dev/null || echo 0) + 1 ))
+    printf '%s' "$n" > "$MOCK_DIR/list.count"
+    if [ -f "$MOCK_DIR/fixed" ] && [ -f "$MOCK_DIR/list.fixed.json" ]; then cat "$MOCK_DIR/list.fixed.json"; exit 0; fi
+    f="$MOCK_DIR/list.$n.json"
+    [ -f "$f" ] || f="$(ls "$MOCK_DIR"/list.[0-9]*.json 2>/dev/null | sort -t. -k2,2n | tail -1)"
+    [ -n "$f" ] && cat "$f"
+    exit "$(cat "$MOCK_DIR/list.rc" 2>/dev/null || echo 0)" ;;
+  add-research)
+    nb=""; mode="fast"; from="web"; import_all=0; query=""; npos=0
+    while [ $# -gt 0 ]; do
+      case "$1" in
+        --)            shift; for q in "$@"; do npos=$((npos+1)); [ "$npos" -eq 1 ] && query="$q"; done; break ;;
+        -n|--notebook) [ $# -ge 2 ] || usage_err "Option '$1' requires an argument."; nb="$2"; shift 2 ;;
+        --from)        [ $# -ge 2 ] || usage_err "Option '$1' requires an argument."; from="$2"; shift 2 ;;
+        --mode)        [ $# -ge 2 ] || usage_err "Option '$1' requires an argument."
+                       case "$2" in fast|deep) mode="$2" ;; *) usage_err "Invalid value for '--mode': '$2' is not one of 'fast', 'deep'." ;; esac; shift 2 ;;
+        --import-all)  import_all=1; shift ;;
+        --timeout)     [ $# -ge 2 ] || usage_err "Option '$1' requires an argument."; shift 2 ;;
+        --json)        shift ;;
+        -*)            usage_err "No such option '$1'. (Did you mean one of: '--help', '--mode'?)" ;;
+        *)             npos=$((npos+1)); [ "$npos" -eq 1 ] && query="$1"; [ "$npos" -gt 1 ] && usage_err "Got unexpected extra argument ($1)"; shift ;;
+      esac
+    done
+    [ "$npos" -le 1 ] || usage_err "Got unexpected extra argument"
+    [ -n "$nb" ] || { echo "No notebook selected. Use -n/--notebook or 'notebooklm use'." >&2; exit 1; }
+    printf 'nb=%s mode=%s from=%s import_all=%s query=%s\n' "$nb" "$mode" "$from" "$import_all" "$query" >> "$MOCK_DIR/add.calls"
+    printf '%s\n' "${NOTEBOOKLM_HEADLESS_REAUTH:-unset}" > "$MOCK_DIR/env.headless"
+    exit "${MOCK_ADD_RC:-0}" ;;
+  *) usage_err "No such command '$sub'." ;;
+esac
