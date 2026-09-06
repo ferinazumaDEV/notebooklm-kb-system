@@ -114,6 +114,30 @@ The full rule, with worked examples, is in
 
 ## Installation
 
+> ### Read this before you install
+>
+> **This kit drives an unofficial CLI.** It is built on
+> [`notebooklm-py`](https://pypi.org/project/notebooklm-py/) by Teng Lin, a community
+> project that automates a browser session against NotebookLM. It is **not** a Google
+> product, there is no supported API behind it, and neither this repository nor
+> `notebooklm-py` is affiliated with or endorsed by Google.
+>
+> What follows from that, in practice:
+>
+> - **Google can break it without notice.** A change to NotebookLM's web app is enough.
+>   When that happens the fix lives upstream, not here.
+> - **Authentication is a browser session, not a token.** It expires on its own schedule
+>   and can fail *silently* — `doctor` and `auth check` report "valid" while every real
+>   call fails. That is why `healthcheck.sh` exists. See
+>   [docs/AUTH-RESILIENCE.md](docs/AUTH-RESILIENCE.md).
+> - **Everything you put in a notebook goes to Google.** That is the design, not a leak.
+>   A notebook is reference material, never a vault — see [Security](#security).
+> - **Treat this as a laboratory, not infrastructure.** It is useful and it is tested,
+>   but do not put anything on its critical path that you cannot do by hand.
+>
+> The full risk notes are in [docs/FAQ.md](docs/FAQ.md) and
+> [SECURITY.md](SECURITY.md).
+
 Two ways to install: an **automated script**, or a **step-by-step guide** for your terminal.
 
 ### Automated scripts
@@ -136,6 +160,49 @@ Prefer to run each step yourself, or need to troubleshoot? Follow the guide for 
 - [Windows (CMD)](install/windows-cmd.md)
 - [Linux](install/linux.md)
 - [macOS](install/macos.md)
+
+---
+
+## Compatibility and what is actually tested
+
+### Versions
+
+| Component | Supported | Notes |
+|---|---|---|
+| `notebooklm-py` | **`>=0.8.2,<0.9`** | Pinned. 0.8.2 changed the CLI shape this kit drives; the upper bound is deliberate, not laziness. |
+| Python | **3.10+** | `notebooklm-py` declares `Requires-Python >=3.10`; the installer refuses anything older. |
+| Linux | supported | Installer + [guide](install/linux.md). On a fresh server also run `playwright install-deps chromium`. |
+| macOS | supported | Installer + [guide](install/macos.md). Uses BSD-tool alternatives where GNU ones differ. |
+| Windows | supported | [PowerShell](install/windows-powershell.md) and [CMD](install/windows-cmd.md) guides, plus `install/install.ps1`. |
+| Browsers | Chrome · Chromium · Edge · Brave · Firefox | Any one you already have. Playwright's Chromium is downloaded only if none is found. |
+
+**When `notebooklm-py` releases 0.9**, this kit does not follow automatically. The pin has
+to be raised deliberately, after checking that the CLI shape the scripts depend on has not
+changed again — which is the whole reason the pin exists.
+
+### What the tests cover, and what they do not
+
+`bash tests/run.sh` → **21 passed, 1 skipped** on a clean machine.
+
+| Covered without a network or an account | How |
+|---|---|
+| All four scripts parse | `bash -n` |
+| `research.sh` argument handling, modes, and the exact CLI invocation it builds | a **mock `notebooklm`** binary in `tests/bin` records what it was called with |
+| A query that looks like a flag (`--help`) is passed as a query, not parsed as one | same mock |
+| `healthcheck.sh` failure classification, including the `AUTH_REQUIRED` envelope | same mock |
+
+That is the part CI runs on every push, and it needs **no Google account and no credentials** —
+which is the point: a suite that required a live session could not run in CI at all.
+
+| **Not** covered automatically | Why |
+|---|---|
+| That the real CLI still accepts the commands these scripts build | Needs `notebooklm-py` installed. The harness *does* test this — `NOTEBOOKLM_REAL_CLI=/path/to/venv/bin/notebooklm bash tests/run.sh` runs five extra checks that reach the auth gate and assert there are no parse errors — but it is skipped when the binary is absent, which is the `1 skipped` above. |
+| That NotebookLM itself still behaves | No API, no contract. Only observation. |
+| Login, session renewal, and actual research runs | Require a real Google session. `healthcheck.sh` exists precisely because these fail *silently*. |
+
+**Run the skipped block before trusting an upgrade.** It is the one check that catches the
+failure mode this kit has actually suffered: the scripts calling a CLI shape that no longer
+exists.
 
 ---
 
