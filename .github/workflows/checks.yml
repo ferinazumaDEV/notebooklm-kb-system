@@ -1,0 +1,91 @@
+name: checks
+
+# This repository is shell, not Python, so there is no pytest to run. What it
+# does have is four scripts that drive a third-party CLI with an exact syntax —
+# and the blockers found in the 2026-09-04 audit were exactly that: the scripts
+# calling a CLI shape that no longer existed. Nothing on push caught any of them.
+#
+# Every check below was run locally before this file was written, so the
+# workflow starts green rather than starting red and being ignored:
+#   bash -n        4 scripts, all clean
+#   shellcheck     0 findings at warning severity on all four (0.11.0)
+#   tests/run.sh   21 passed, 0 failed, 1 skipped
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  # Pinned to the version these scripts were actually verified against. The
+  # runner image ships its own shellcheck, but its version floats, and a bump
+  # can introduce checks that turn a green build red for reasons unrelated to
+  # any commit. Bump this deliberately, not by surprise.
+  #
+  # Note the fourth component: the PyPI package appends its own build number,
+  # so 0.11.0.1 is the wrapper around shellcheck 0.11.0. A plain "0.11.0" does
+  # not exist on PyPI and fails to install.
+  SHELLCHECK_VERSION: "0.11.0.1"
+
+jobs:
+  shell:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Syntax-check every script
+        run: |
+          for f in research.sh healthcheck.sh install/install.sh tests/run.sh; do
+            echo "bash -n $f"
+            bash -n "$f"
+          done
+
+      - name: Install shellcheck
+        run: pip install "shellcheck-py==${SHELLCHECK_VERSION}"
+
+      - name: shellcheck
+        # Severity is `warning`: all four scripts are clean at that level today,
+        # so this gate is real and not decoration. What remains below it is
+        # style (SC2086 and friends); raise the bar to `style` only in the same
+        # commit that fixes them, never before.
+        run: |
+          shellcheck --version | sed -n '1,3p'
+          shellcheck --severity=warning research.sh healthcheck.sh install/install.sh tests/run.sh
+
+      - name: Run the mock-CLI harness
+        # tests/run.sh drives a fake notebooklm binary from tests/bin, so this
+        # needs no Google account, no network and no real credentials.
+        run: bash tests/run.sh
+
+  powershell:
+    # install.ps1 is the only Windows install path and no Linux runner can
+    # execute it. Parsing it on a Windows runner catches the syntax errors that
+    # would otherwise be found by a user, once, at the worst moment.
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Parse install.ps1
+        shell: pwsh
+        run: |
+          # Resolve to an absolute path first: .NET's working directory is not
+          # PowerShell's, so ParseFile with a relative path can read the wrong
+          # file or none at all.
+          $path = (Resolve-Path 'install/install.ps1').Path
+          $errors = $null
+          [System.Management.Automation.Language.Parser]::ParseFile(
+            $path, [ref]$null, [ref]$errors) | Out-Null
+          if ($errors) {
+            $errors | ForEach-Object { Write-Host "$($_.Extent.StartLineNumber): $($_.Message)" }
+            exit 1
+          }
+          Write-Host "install.ps1 parses cleanly"

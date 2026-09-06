@@ -120,6 +120,8 @@ grep -q '^nb=nb1 mode=fast from=web import_all=1 query=--help$' "$d/add.calls" 2
 
 # ---------------------------------------------------------------------------------------
 section "3. healthcheck.sh (mock CLI)"
+# shellcheck disable=SC2120  # forwards "$@" on purpose: callers may pass extra
+# healthcheck flags, even though every current case runs it bare.
 HCR() { KB_HOME="$k" KB_HEALTHCHECK_NOTEBOOK=nb1 bash "$HC" "$@"; }
 
 # H1 missing KB_HEALTHCHECK_NOTEBOOK
