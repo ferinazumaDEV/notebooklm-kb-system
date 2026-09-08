@@ -1,3 +1,4 @@
+<!-- synced-from: 6fcdf092f5358f3649ac7f2440098b9fc5fc4b38 -->
 # NotebookLM KB System — un "segundo cerebro" eficiente en tokens para agentes de IA
 
 **English**: [README.md](README.md) · [Español](README.es.md)
