@@ -6,7 +6,7 @@
 > workflow that gives an AI agent a persistent, **token-efficient second brain**: a tiny local
 > memory loaded every session plus a large NotebookLM corpus queried on demand. In short, it's
 > practical **AI agent memory** that can **reduce agent token cost** for broad, multi-source
-> **research** by roughly **99%** versus a multi-agent web crawl.
+> **research** by **~99% of the output tokens billed to the agent — in one documented comparison** (n = 1; see *Token savings*) versus a multi-agent web crawl.
 
 A tiny, self-hostable knowledge base that lets an AI agent **remember a lot while loading
 almost nothing** each session. It's a **second brain for LLM agents** with two write stores and
@@ -289,7 +289,9 @@ compact result that comes back.
 | Latency | minutes (async) | minutes (in parallel) |
 | What you get | faithful, cited synthesis of the corpus | a synthesized report |
 
-For a broad recon that's roughly **1.9M → ~5K agent tokens — about a 99% reduction.**
+For that one broad recon: **1.9M → ~5K agent tokens, about a 99% reduction — measured once.**
+
+**What that number is, and is not.** It is one task, run one time, counting only the output tokens billed to the agent; NotebookLM's own compute is not counted, the two outputs were not scored for equal quality, and run-to-run variability was not measured. It is a documented observation, not a rate. A small benchmark — corpus, question, redacted outputs, token counter, denominator, repetitions, quality criteria — is the honest next step, and until it exists the figure should be read as *what happened once*.
 
 ### Rough per-research and monthly math
 
@@ -297,7 +299,7 @@ Illustrative, to show the order of magnitude (plug in your own rates):
 
 - **Per broad research:** ~5K tokens (NotebookLM path) vs ~1.9M tokens (swarm path).
 - **~20 broad recons/month:** ~0.1M tokens vs ~38M tokens — a gap of roughly
-  **~37.9M tokens/month**, the same ~99% savings carried across the month.
+  **~37.9M tokens/month** — *if* that single comparison were typical, which has not been tested. This is arithmetic on n = 1, shown for scale, not a monthly saving anyone has measured.
 
 The savings compound every time you *re-query* the corpus too: an `ask` against an existing
 notebook is a few-K-token read forever, versus re-running the whole recon.
@@ -368,7 +370,7 @@ happened (it never trusts the exit code). You then read the result with
 `notebooklm ask -n <NOTEBOOK_ID> "<question>"` or `notebooklm source fulltext -n <NOTEBOOK_ID> <SOURCE_ID>`.
 
 **How much can this save vs a multi-agent research workflow?**
-For broad, multi-source recon, roughly **99%**. A measured 52-agent fan-out cost about
+In the one comparison measured, **~99% of the output tokens billed to the agent**. A 52-agent fan-out cost about
 **1.9M output tokens**; the same discovery routed through NotebookLM costs the agent only a
 few thousand tokens to read the compact, cited result — because the crawl-and-summarize runs
 on Google's side, outside the agent's token budget.

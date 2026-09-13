@@ -1,4 +1,4 @@
-<!-- synced-from: c7873c44afe6c01d99f25e09de63eb216ed390c3 -->
+<!-- synced-from: 67799ac35e99bb9c3c581d45b9de8870b4813c77 -->
 # NotebookLM KB System — un "segundo cerebro" eficiente en tokens para agentes de IA
 
 **English**: [README.md](README.md) · [Español](README.es.md)
@@ -8,7 +8,7 @@
 > **eficiente en tokens**: una memoria local diminuta que se carga en cada sesión, más un corpus
 > grande en NotebookLM que se consulta bajo demanda. En corto: **memoria práctica para agentes de
 > IA** que puede **reducir el coste en tokens** de una investigación amplia y multifuente en
-> torno a un **99%** frente a un rastreo web con múltiples agentes.
+> **~99% de los tokens de salida facturados al agente — en una comparación documentada** (n = 1; ver *Ahorro de tokens*) frente a un rastreo web con múltiples agentes.
 
 Una base de conocimiento pequeña y autoalojable que permite a un agente de IA **recordar mucho
 cargando casi nada** en cada sesión. Es un **segundo cerebro para agentes LLM** con dos almacenes
@@ -296,8 +296,9 @@ compacto que vuelve.
 | Latencia | minutos (asíncrono) | minutos (en paralelo) |
 | Qué obtienes | una síntesis fiel y con citas del corpus | un informe sintetizado |
 
-Para un reconocimiento amplio eso es aproximadamente **1,9M → ~5K tokens de agente: en torno a un
-99% de reducción.**
+Para ese reconocimiento amplio: **1,9M → ~5K tokens de agente, en torno a un 99% de reducción — medido una vez.**
+
+**Qué es ese número, y qué no es.** Es una tarea, ejecutada una vez, contando solo los tokens de salida facturados al agente; el cómputo propio de NotebookLM no se cuenta, las dos salidas no se puntuaron por calidad equivalente, y la variabilidad entre ejecuciones no se midió. Es una observación documentada, no una tasa. Un benchmark pequeño —corpus, pregunta, salidas redactadas, contador de tokens, denominador, repeticiones, criterios de calidad— es el siguiente paso honesto; hasta que exista, la cifra se lee como *lo que pasó una vez*.
 
 ### Cuentas aproximadas por investigación y por mes
 
@@ -305,7 +306,7 @@ Ilustrativas, para dar el orden de magnitud (mete tus propias tarifas):
 
 - **Por investigación amplia:** ~5K tokens (camino NotebookLM) frente a ~1,9M tokens (camino enjambre).
 - **~20 reconocimientos amplios al mes:** ~0,1M tokens frente a ~38M tokens — una diferencia de
-  aproximadamente **~37,9M tokens/mes**, el mismo ~99% de ahorro llevado a lo largo del mes.
+  aproximadamente **~37,9M tokens/mes** — *si* esa única comparación fuera representativa, cosa que no se ha comprobado. Es aritmética sobre n = 1, mostrada para dar la escala, no un ahorro mensual que nadie haya medido.
 
 El ahorro se acumula también cada vez que *vuelves a consultar* el corpus: un `ask` contra un
 cuaderno existente es para siempre una lectura de unos pocos miles de tokens, frente a rehacer el
@@ -381,7 +382,7 @@ importación ocurrió de verdad (nunca se fía del código de salida). Luego lee
 `notebooklm source fulltext -n <NOTEBOOK_ID> <SOURCE_ID>`.
 
 **¿Cuánto puede ahorrar frente a un flujo de investigación multiagente?**
-Para reconocimiento amplio y multifuente, en torno al **99%**. Un fan-out medido de 52 agentes costó
+En la única comparación medida, **~99% de los tokens de salida facturados al agente**. Un fan-out de 52 agentes costó
 unos **1,9M tokens de salida**; el mismo descubrimiento enrutado por NotebookLM le cuesta al agente
 solo unos pocos miles de tokens leer el resultado compacto y citado — porque el rastreo y el resumen
 se ejecutan del lado de Google, fuera del presupuesto de tokens del agente.
