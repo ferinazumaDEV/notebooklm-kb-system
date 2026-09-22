@@ -15,9 +15,17 @@ upgrade path.
   deposit metadata on its own, and the v0.1.0 record was archived with the license id
   `apgl-v3` while the repository declares AGPL-3.0. That id **is not in Zenodo's
   licence vocabulary**, which lists `agpl-3.0-only` and `agpl-3.0-or-later` and
-  nothing resembling `apgl-v3`. Declaring the metadata settles it. The file carries
-  the concept DOI read from the existing deposit, not a guessed one, and
-  `AGPL-3.0-only` because that is what `LICENSE` and the README already say.
+  nothing resembling `apgl-v3`. The file carries the concept DOI read from the
+  existing deposit, not a guessed one, and `AGPL-3.0-only` because that is what
+  `LICENSE` and the README already say.
+
+  **It did not fix the licence, and this entry said it would.** Measured after
+  publishing v0.1.1: the deposit was minted with `{"id": "apgl-v3"}` again, with the
+  citation file present and declaring `AGPL-3.0-only`. Whatever produces that id is
+  upstream of `CITATION.cff`. Everything else in the deposit is correct — version,
+  concept DOI, and an archive byte-for-byte identical to the tag across all 30 files.
+  The mechanism is not established and is not guessed at here; see `RELEASING.md` for
+  what to try next and how to test it without risking a deposit.
 - **`RELEASING.md`.** The procedure for this repository, whose important half is that
   it is the *opposite* of a package repository: there is no `release.yml`, the tag
   triggers nothing, and publishing the GitHub Release **by hand** is what fires the
