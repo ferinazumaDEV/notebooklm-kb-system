@@ -30,12 +30,13 @@ abstract: >-
 # with no DOI minted. That is not a guess: it is what happened to the cookbook's
 # v0.1.0 on 4 Sep 2026, reproduced with cffconvert 2.0.0.
 #
-# The value is AGPL-3.0-only because that is what this repository actually declares:
-# the README says "GNU Affero General Public License v3.0 (AGPL-3.0)", LICENSE is the
-# plain AGPLv3 text with no "or any later version" clause, and GitHub detects
-# AGPL-3.0. Changing which licence this software is under is not a metadata edit, so
-# this file follows the repository rather than leading it.
-license: AGPL-3.0-only
+# AGPL-3.0-or-later: the licence policy for this cluster's service-with-a-moat, decided
+# on 25 August 2026 and applied to this repository on 22 September 2026, when the source
+# headers, both READMEs, the FAQ and the provenance notes were all moved to it in one
+# change. Until then the repository said "AGPL-3.0" everywhere, which is the "only"
+# form. The change is a relaxation — it grants more, not less — made by the sole
+# copyright holder. This file follows the repository's declared licence; it never leads it.
+license: AGPL-3.0-or-later
 keywords:
   - notebooklm
   - knowledge base

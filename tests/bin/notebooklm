@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Copyright (C) 2026 Fernando Aporta Franco — Licensed under AGPL-3.0 (see LICENSE).
+# Copyright (C) 2026 Fernando Aporta Franco — Licensed under AGPL-3.0-or-later (see LICENSE).
 #
 # tests/bin/notebooklm — a STRICT mock of the notebooklm-py 0.8.2 CLI surface that
 # research.sh and healthcheck.sh use. It parses arguments the way the real CLI does

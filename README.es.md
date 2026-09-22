@@ -1,4 +1,4 @@
-<!-- synced-from: 67799ac35e99bb9c3c581d45b9de8870b4813c77 -->
+<!-- synced-from: 84f5879a95566450c255686c84dbb117665a5ed1 -->
 # NotebookLM KB System — un "segundo cerebro" eficiente en tokens para agentes de IA
 
 **English**: [README.md](README.md) · [Español](README.es.md)
@@ -248,7 +248,7 @@ notebooklm-kb-system/
 ├── README.md                        # este hub: concepto, enlaces, cuentas de tokens, seguridad
 ├── research.sh                      # wrapper de investigacion web: research.sh <NOTEBOOK_ID> "<consulta>" fast|deep
 ├── healthcheck.sh                   # healthcheck de auth + aviso por email (ver docs/AUTH-RESILIENCE.md)
-├── LICENSE                          # AGPL-3.0
+├── LICENSE                          # AGPL-3.0-or-later
 ├── tests/
 │   ├── run.sh                       # bash tests/run.sh — pruebas de comportamiento de ambos scripts
 │   └── bin/notebooklm               # simulador estricto de la superficie CLI de notebooklm-py 0.8.2
@@ -407,7 +407,7 @@ verificar), y que la investigación es asíncrona con latencia de minutos. Úsal
 recolección amplia, y que después el agente verifique las afirmaciones que sostienen la decisión.
 
 **¿Es esto un producto oficial de Google o de NotebookLM?**
-No. Es un flujo de trabajo independiente y de código abierto (AGPL-3.0) construido sobre la CLI no
+No. Es un flujo de trabajo independiente y de código abierto (AGPL-3.0-or-later) construido sobre la CLI no
 oficial `notebooklm-py` de Teng Lin (<https://github.com/teng-lin/notebooklm-py>, MIT); probado con
 notebooklm-py 0.8.2. No está afiliado a Google ni a NotebookLM, ni respaldado ni soportado por ellos.
 
@@ -432,14 +432,14 @@ Por [ferinazumaDEV](https://github.com/ferinazumaDEV).
 
 ## Licencia
 
-Licenciado bajo la **GNU Affero General Public License v3.0 (AGPL-3.0)** — ver [LICENSE](LICENSE).
+Licenciado bajo la **GNU Affero General Public License v3.0 or later (AGPL-3.0-or-later)** — ver [LICENSE](LICENSE).
 
 Copyright (C) 2026 Fernando Aporta Franco
 
 **Qué significa esto:** puedes usar, estudiar, modificar y compartir este software libremente, pero
 **si lo distribuyes —o ejecutas una versión modificada como servicio en red (SaaS)— tienes que
-publicar tu código fuente correspondiente completo bajo los mismos términos de la AGPL-3.0.** No se
+publicar tu código fuente correspondiente completo bajo los mismos términos de la AGPL-3.0-or-later.** No se
 puede cerrar el código. Esto es deliberado: el proyecto es público para compartirse, no para
 volverse propietario.
 
-<!-- provenance-fingerprint: nbkb-ec948d2d85 (AGPL-3.0, github.com/ferinazumaDEV/notebooklm-kb-system) -->
+<!-- provenance-fingerprint: nbkb-ec948d2d85 (AGPL-3.0-or-later, github.com/ferinazumaDEV/notebooklm-kb-system) -->

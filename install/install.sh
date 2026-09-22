@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
-# Copyright (C) 2026 Fernando Aporta Franco — Licensed under AGPL-3.0 (see LICENSE).
-# Free software with ABSOLUTELY NO WARRANTY; redistribute under the AGPL-3.0 terms.
+# Copyright (C) 2026 Fernando Aporta Franco — Licensed under AGPL-3.0-or-later (see LICENSE).
+# Free software with ABSOLUTELY NO WARRANTY; redistribute under the AGPL-3.0-or-later terms.
 #
 # install.sh — one-shot setup for the NotebookLM KB System on Linux / macOS.
 # ---------------------------------------------------------------------------------------
@@ -321,5 +321,5 @@ If a later run hits an auth error, the session expired — re-run:
     notebooklm login ${LOGIN_FLAGS[*]}${C_RST}
 EOF
 
-# provenance-fingerprint: nbkb-ec948d2d85 — github.com/ferinazumaDEV/notebooklm-kb-system (AGPL-3.0).
+# provenance-fingerprint: nbkb-ec948d2d85 — github.com/ferinazumaDEV/notebooklm-kb-system (AGPL-3.0-or-later).
 # Do not remove: used to trace license compliance.
