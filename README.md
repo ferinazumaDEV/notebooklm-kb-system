@@ -242,7 +242,7 @@ notebooklm-kb-system/
 ├── README.md                        # this hub — concept, install/doc links, token math, security
 ├── research.sh                      # web-research wrapper: research.sh <NOTEBOOK_ID> "<query>" fast|deep
 ├── healthcheck.sh                   # auth healthcheck + email alert (see docs/AUTH-RESILIENCE.md)
-├── LICENSE                          # AGPL-3.0
+├── LICENSE                          # AGPL-3.0-or-later
 ├── tests/
 │   ├── run.sh                       # bash tests/run.sh — behaviour tests for both scripts (see below)
 │   └── bin/notebooklm               # strict mock of the notebooklm-py 0.8.2 CLI surface the scripts use
@@ -393,7 +393,7 @@ fact-checking), and research is async with minute-scale latency. Use it as a pip
 gathering, then have the agent verify the load-bearing claims.
 
 **Is this an official Google or NotebookLM product?**
-No. It's an independent, open-source (AGPL-3.0) workflow built on top of the unofficial
+No. It's an independent, open-source (AGPL-3.0-or-later) workflow built on top of the unofficial
 `notebooklm-py` CLI by Teng Lin (<https://github.com/teng-lin/notebooklm-py>, MIT); tested with
 notebooklm-py 0.8.2. It isn't affiliated with, endorsed by, or supported by Google or NotebookLM.
 
@@ -417,10 +417,10 @@ By [ferinazumaDEV](https://github.com/ferinazumaDEV).
 
 ## License
 
-Licensed under the **GNU Affero General Public License v3.0 (AGPL-3.0)** — see [LICENSE](LICENSE).
+Licensed under the **GNU Affero General Public License v3.0 or later (AGPL-3.0-or-later)** — see [LICENSE](LICENSE).
 
 Copyright (C) 2026 Fernando Aporta Franco
 
-**What this means:** you may use, study, modify and share this software freely, but **if you distribute it — or run a modified version as a network service (SaaS) — you must release your complete corresponding source code under the same AGPL-3.0 terms.** It cannot be taken closed-source. This is deliberate: the project is public to be shared, not made proprietary.
+**What this means:** you may use, study, modify and share this software freely, but **if you distribute it — or run a modified version as a network service (SaaS) — you must release your complete corresponding source code under the same AGPL-3.0-or-later terms.** It cannot be taken closed-source. This is deliberate: the project is public to be shared, not made proprietary.
 
-<!-- provenance-fingerprint: nbkb-ec948d2d85 (AGPL-3.0, github.com/ferinazumaDEV/notebooklm-kb-system) -->
+<!-- provenance-fingerprint: nbkb-ec948d2d85 (AGPL-3.0-or-later, github.com/ferinazumaDEV/notebooklm-kb-system) -->

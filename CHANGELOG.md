@@ -7,6 +7,20 @@ This is a kit of shell scripts rather than a package, so a "version" is a state 
 the scripts and their documentation. Only `main` is supported; `git pull` is the
 upgrade path.
 
+## [Unreleased]
+
+### Changed
+
+- **The licence is now AGPL-3.0-or-later, stated everywhere.** Until this change the
+  repository said "AGPL-3.0" in every source header, both READMEs, the FAQ, the
+  provenance notes and `CITATION.cff` — which is the "only" form. The cluster's
+  licence policy for a service-with-a-moat has been AGPL-3.0-or-later since
+  25 August 2026, and this repository had drifted from it. Nineteen occurrences
+  moved in one change so that no two files disagree. `LICENSE` itself is untouched:
+  it is the Free Software Foundation's text, and the "or later" choice is expressed
+  in the notices, as the licence's own instructions say. This is a relaxation made
+  by the sole copyright holder; it grants more, not less.
+
 ## [0.1.1] — 2026-09-22
 
 ### Added

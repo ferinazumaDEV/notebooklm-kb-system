@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
-# Copyright (C) 2026 Fernando Aporta Franco — Licensed under AGPL-3.0 (see LICENSE).
-# Free software with ABSOLUTELY NO WARRANTY; redistribute under the AGPL-3.0 terms.
+# Copyright (C) 2026 Fernando Aporta Franco — Licensed under AGPL-3.0-or-later (see LICENSE).
+# Free software with ABSOLUTELY NO WARRANTY; redistribute under the AGPL-3.0-or-later terms.
 #
 # tests/run.sh — behavioural tests for research.sh and healthcheck.sh.
 #

@@ -147,7 +147,7 @@ with worked examples is in [Knowledge routing](KNOWLEDGE-ROUTING.md).
 
 ## Is this an official Google or NotebookLM product?
 
-No. It's an independent, open-source project (AGPL-3.0) that builds a memory-and-research
+No. It's an independent, open-source project (AGPL-3.0-or-later) that builds a memory-and-research
 workflow on top of the unofficial `notebooklm-py` CLI by Teng Lin
 (<https://github.com/teng-lin/notebooklm-py>, MIT); tested with notebooklm-py 0.8.2. It is not
 affiliated with, endorsed by, or supported by
