@@ -85,14 +85,25 @@ print(d["metadata"]["version"], d["doi"], d.get("conceptdoi"), d["metadata"].get
 PY
 ```
 
-`metadata.version` must equal the tag. Check `license` too: before `CITATION.cff` existed, Zenodo derived it on
-its own and the v0.1.0 record was archived as `apgl-v3`, which **is not in Zenodo's licence vocabulary**. Theirs
-lists `agpl-3.0-only` and `agpl-3.0-or-later`, and the deposit's value matches neither. Query it at
-`https://zenodo.org/api/vocabularies/licenses/<id>` with lowercase ids **and a browser User-Agent**: the API
-answers `403` to a default client, and the older `/api/licenses/<id>` path is gone. The uppercase SPDX id in
-`CITATION.cff` maps to the lowercase vocabulary id — the other repositories in this cluster write
-`CC-BY-SA-4.0` and their deposits read back `cc-by-sa-4.0`, which is where that mapping is evidenced rather than
-assumed.
+`metadata.version` must equal the tag.
+
+**Do not expect `license` to be right, and know why.** Both deposits of this repository — v0.1.0, before the
+citation file existed, and v0.1.1, with it present and declaring `AGPL-3.0-only` — were minted with
+`{"id": "apgl-v3"}`. That id **is not in Zenodo's licence vocabulary**, which lists `agpl-3.0-only` and
+`agpl-3.0-or-later`. So whatever produces it sits upstream of `CITATION.cff`, and adding that file did not move
+it. The mechanism is not established; this document does not guess at one.
+
+Query the vocabulary at `https://zenodo.org/api/vocabularies/licenses/<id>`, with lowercase ids **and a browser
+User-Agent**: the API answers `403` to a default client, and the older `/api/licenses/<id>` path is gone.
+
+**What to try next, and how to test it without risking a deposit.** The GitHub integration reads a
+`.zenodo.json` at the repository root, which overrides derived metadata. It has not been added here, on purpose:
+a wrong shape can make a deposit fail outright and mint no DOI at all, which is worse than a wrong licence id,
+and there is no dry run. Test it on a **throwaway public repository** with its own Zenodo hook first — tag it,
+release it, read the record back — and only then bring the proven file here. That is the same negative-control
+discipline used everywhere else in this cluster: see the file fail, and see it pass, before trusting it.
+
+Two other ways this check has misled:
 
 Two ways this check has misled before:
 
