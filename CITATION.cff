@@ -1,0 +1,48 @@
+cff-version: 1.2.0
+title: "notebooklm-kb-system"
+message: "If you use this kit, please cite it."
+type: software
+authors:
+  - family-names: "Aporta Franco"
+    given-names: "Fernando"
+    alias: ferinazumaDEV
+repository-code: "https://github.com/ferinazumaDEV/notebooklm-kb-system"
+# Landing page for citation. The DOI, not the repository URL: repository-code above
+# already carries the GitHub location, and a repository URL breaks on a rename, an
+# account move or a platform migration. The concept DOI does not.
+url: "https://doi.org/10.5281/zenodo.22554843"
+# Concept DOI: resolves to the latest archived release, so it does not change when a
+# new version is tagged. Version DOIs live on the Zenodo record page, not here.
+# Read from the existing v0.1.0 deposit rather than assumed.
+doi: "10.5281/zenodo.22554843"
+identifiers:
+  - type: doi
+    value: "10.5281/zenodo.22554843"
+    description: "Concept DOI — always the latest version"
+abstract: >-
+  A kit of shell scripts that turns a NotebookLM notebook into a queryable knowledge
+  base for an agent: build documents from sources, publish them, ask questions from a
+  terminal, and degrade to a local copy when the session is not available. It is not
+  affiliated with Google, and it is built on an unofficial interface, so anything it
+  depends on can change without notice.
+# ONE license id here, deliberately, and it is a scalar. A YAML list converts to
+# {"id": [...]}, Zenodo rejects the deposit, and the release is archived as Failed
+# with no DOI minted. That is not a guess: it is what happened to the cookbook's
+# v0.1.0 on 4 Sep 2026, reproduced with cffconvert 2.0.0.
+#
+# The value is AGPL-3.0-only because that is what this repository actually declares:
+# the README says "GNU Affero General Public License v3.0 (AGPL-3.0)", LICENSE is the
+# plain AGPLv3 text with no "or any later version" clause, and GitHub detects
+# AGPL-3.0. Changing which licence this software is under is not a metadata edit, so
+# this file follows the repository rather than leading it.
+license: AGPL-3.0-only
+keywords:
+  - notebooklm
+  - knowledge base
+  - retrieval
+  - agent tooling
+  - shell
+# version and date-released are bumped together with the git tag. The tag is the
+# source of truth; these two are the copy the citation format requires.
+version: "0.1.1"
+date-released: "2026-09-22"
