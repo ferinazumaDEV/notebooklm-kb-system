@@ -86,9 +86,13 @@ PY
 ```
 
 `metadata.version` must equal the tag. Check `license` too: before `CITATION.cff` existed, Zenodo derived it on
-its own and the v0.1.0 record was archived as `apgl-v3` while the repository declares AGPL-3.0. Whether that id
-is a legacy Zenodo spelling or an error was never established — their licenses API refuses our requests with
-`403` — which is exactly why the metadata is now declared rather than inferred.
+its own and the v0.1.0 record was archived as `apgl-v3`, which **is not in Zenodo's licence vocabulary**. Theirs
+lists `agpl-3.0-only` and `agpl-3.0-or-later`, and the deposit's value matches neither. Query it at
+`https://zenodo.org/api/vocabularies/licenses/<id>` with lowercase ids **and a browser User-Agent**: the API
+answers `403` to a default client, and the older `/api/licenses/<id>` path is gone. The uppercase SPDX id in
+`CITATION.cff` maps to the lowercase vocabulary id — the other repositories in this cluster write
+`CC-BY-SA-4.0` and their deposits read back `cc-by-sa-4.0`, which is where that mapping is evidenced rather than
+assumed.
 
 Two ways this check has misled before:
 
