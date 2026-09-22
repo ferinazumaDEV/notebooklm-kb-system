@@ -12,12 +12,12 @@ upgrade path.
 ### Added
 
 - **`CITATION.cff`.** Until now this repository had none, so Zenodo derived the
-  deposit metadata on its own: the v0.1.0 record was archived with the license id
-  `apgl-v3` while the repository declares AGPL-3.0. Whether that is a legacy Zenodo
-  spelling or an error could not be established — their licenses API refuses our
-  requests with `403` — so the fix is to declare the metadata rather than argue about
-  what was inferred. The file carries the concept DOI read from the existing deposit,
-  not a guessed one.
+  deposit metadata on its own, and the v0.1.0 record was archived with the license id
+  `apgl-v3` while the repository declares AGPL-3.0. That id **is not in Zenodo's
+  licence vocabulary**, which lists `agpl-3.0-only` and `agpl-3.0-or-later` and
+  nothing resembling `apgl-v3`. Declaring the metadata settles it. The file carries
+  the concept DOI read from the existing deposit, not a guessed one, and
+  `AGPL-3.0-only` because that is what `LICENSE` and the README already say.
 - **`RELEASING.md`.** The procedure for this repository, whose important half is that
   it is the *opposite* of a package repository: there is no `release.yml`, the tag
   triggers nothing, and publishing the GitHub Release **by hand** is what fires the
