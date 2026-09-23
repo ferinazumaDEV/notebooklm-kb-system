@@ -9,6 +9,12 @@ upgrade path.
 
 ## [Unreleased]
 
+### Changed
+
+- **`RELEASING.md` records the result of the licence check.** The v0.1.2 record
+  (10.5281/zenodo.22923166) was archived with `agpl-3.0-or-later`: `.zenodo.json`
+  works. Earlier records keep `apgl-v3` and are not edited.
+
 ## [0.1.2] — 2026-09-23
 
 One purpose: find out, on a real record, whether `.zenodo.json` fixes the archived
