@@ -6,6 +6,11 @@ whole knowledge base. This document explains how it rots — including the part 
 keepalive alone does **not** fix — and a small, layered setup that turns a silent multi-day
 outage into a self-healing system with an honest early alert and a graceful degraded mode.
 
+*Dated note, 2026-09-23.* The first sentence is true of the consumer product this kit drives. A
+Preview, enterprise-only API exists (notebooks, sources, audio overviews; no documented ask/chat
+operation) — see [FAQ: Is there an official API?](FAQ.md#is-there-an-official-api). It changes
+nothing below.
+
 > TL;DR: a frequent cookie keepalive is necessary but **not sufficient**. The multi-day death
 > is a **device-bound token** problem that only a **real browser exercising the profile** (or a
 > host-local device key) can prevent. Layer it: warm-profile keepalive → real-operation
@@ -22,6 +27,8 @@ and it's exactly the trap the first version of this doc fell into.
    short window. If your keepalive is too infrequent it can simply *cross* that window and the
    session dies. A frequent `auth refresh` (every ~15 min) fixes **this** failure — and only
    this one.
+   *(Cookie name and rotation cadence are Google-side behaviour observed when this was written;
+   needs-verification, 2026-09-23.)*
 
 2. **The device-bound tokens (days) — the one a keepalive can't touch.** Modern Google
    sessions are also held up by **device-bound credentials** (Google's **DBSC** — Device Bound
@@ -79,6 +86,10 @@ key that renews**, and there are two ways to get one:
   **tunnel it** (`ssh -L 9222:127.0.0.1:9222 …`) — never point it at a LAN / VPN / remote IP
   (a non-loopback endpoint is account-equivalent access and is refused). This is the freshest
   source, but it depends on that machine staying on.
+  *Dated confirmation, 2026-09-23:* upstream's configuration reference documents the endpoint as
+  `NOTEBOOKLM_HEADLESS_REAUTH_CDP_URL`, which "must be loopback (`127.0.0.1`, `::1`, or
+  `localhost`); remote endpoints are ignored because CDP is account-equivalent" (Source:
+  [notebooklm-py docs/configuration.md](https://github.com/teng-lin/notebooklm-py/blob/main/docs/configuration.md)).
 
 ### 3. A real-operation healthcheck that alerts (reactive)
 
@@ -106,6 +117,17 @@ Wrap the `ask` path so it (a) exports `NOTEBOOKLM_HEADLESS_REAUTH=1` (lets the C
 session mid-call), (b) retries once on an auth error, and (c) on a persistent auth failure
 prints **one clean human line** with the re-login steps instead of a stack trace + "report a
 bug". Your agents get a readable signal, not noise.
+
+*Dated note, 2026-09-23.* "No parseable chunks in streaming chat response" is not always an auth
+or wire-format failure: upstream issue #2425 shows the same message when the `ask` payload is
+too large and the server answers `INVALID_ARGUMENT` (Source: [notebooklm-py issue
+#2425](https://github.com/teng-lin/notebooklm-py/issues/2425)). That misreport occurred on CLI 0.7.3 and is fixed from 0.8.0 (#1636): the
+maintainer confirmed on 2026-09-20 that 0.8.0 and `main` raise `ChatError` identifying server
+status 3 and advising the caller to shorten the request (Source: [notebooklm-py issue #2425,
+maintainer comment](https://github.com/teng-lin/notebooklm-py/issues/2425)). On the 0.8.2 this kit pins, an oversize `ask` therefore surfaces as
+that `ChatError`, and it is that error — not the parse message — that the wrapper should treat
+as an oversize prompt rather than an auth failure: do not retry it as auth, do not escalate it to
+a re-login; shorten or split the ask.
 
 ### 5. A local degraded mode (don't go blind during an outage)
 
@@ -144,6 +166,13 @@ Verify with a **real op** (not `doctor`): `notebooklm source list -n <NOTEBOOK_I
 With a renewing device key (A/C) in place, this manual step should become rare — and the
 healthcheck guarantees you hear about it in minutes, not days.
 
+*Dated note, 2026-09-23.* A seeded profile carries cookies for the host it logged into. Since
+notebooklm-py 0.8.1 (2026-08-14) the CLI targets `https://notebook.google.com` by default, with
+`https://notebooklm.google.com` still served for existing setups (Source: [notebooklm-py v0.8.1
+release](https://github.com/teng-lin/notebooklm-py/releases/tag/v0.8.1)). A profile seeded on the old host, or a check that greps for
+`notebooklm.google.com` in redirects, should be re-checked after the rebrand; the operational
+effect was not measured here (needs-verification, 2026-09-23).
+
 ## Hardening a live KB without downtime
 
 Rebuilding the auth stack under a KB people rely on? Do it **side-by-side**: build the new stack
@@ -166,3 +195,12 @@ no human login. It is tempting for "never falls again" — and it is a **bad ide
 The trade this system makes instead: short-lived browser cookies + a **host-local device key**
 that renews them + a rare, early-flagged human re-login. Slightly less "hands-off", dramatically
 smaller blast radius. Keep it.
+
+*Dated note, 2026-09-23.* Upstream now ships this path as a first-class option: notebooklm-py
+0.8.2 (2026-09-02) adds an Android backend, selected with `--backend android` or
+`NOTEBOOKLM_BACKEND=android`, that talks to the native gRPC service "using short-lived OAuth
+bearer tokens minted on demand from a stored master token"; the Web backend remains the default,
+and the release itself warns that the master token "is a more powerful credential than a cookie
+snapshot; use a dedicated account and protect it carefully" (Source: [notebooklm-py v0.8.2
+release](https://github.com/teng-lin/notebooklm-py/releases/tag/v0.8.2)). The trade-off stated in this section is unchanged and this kit's
+default is unchanged: browser session plus warm profile, no master token on the host.

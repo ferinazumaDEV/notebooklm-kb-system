@@ -9,6 +9,25 @@ upgrade path.
 
 ## [Unreleased]
 
+### Added
+
+- **Dated notes (2026-09-23) across the README and `docs/`, from a review of upstream and
+  Google sources.** Each note carries its date and its source; nothing earlier is rewritten.
+  What they record: Google renamed NotebookLM to Gemini Notebook on 2026-07-16 (the CLI,
+  the package and this repository keep the old name); a Preview, enterprise-only API exists
+  and has no documented ask/chat operation, so "no supported API" still holds for the consumer
+  product this kit drives; the published product limits (sources per notebook by plan,
+  500,000 words or 200 MB per source, compute-based usage limits with a 5-hour refresh since
+  2026-09-02); `notebooklm-py` 0.8.2 is the latest release on PyPI and upstream `main` already
+  labels its unreleased work v0.9, so the `<0.9` pin stops at the next release by design;
+  0.8.2 ships a master-token Android backend that this kit deliberately does not use; the
+  default host is `notebook.google.com` since 0.8.1; two upstream reports that sharpen
+  existing rules (an oversize `ask` payload surfaced as a misleading parse error on CLI
+  0.7.3, fixed upstream in 0.8.0 — on the pinned 0.8.2 it is a `ChatError` with server
+  status 3, issue #2425; the studio wait step reported `REMOVED` for finished generations,
+  issue #2432);
+  and Python 3.10, the floor upstream declares, reaches end of life in October 2026.
+
 ### Changed
 
 - **`RELEASING.md` records the result of the licence check.** The v0.1.2 record

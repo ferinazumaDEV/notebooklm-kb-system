@@ -77,6 +77,14 @@ A tiny local config maps friendly keys to ids so you never paste a UUID by hand:
 Aim for a small number of broad notebooks rather than many tiny ones. When a
 notebook nears its source cap or its topic clearly forks, split it.
 
+*Dated note, 2026-09-23.* The cap has a number, per plan: 50 sources per notebook on the
+standard plan, 100 on AI Plus, 300 on AI Pro, 500 and 600 on the two AI Ultra plans, in a
+table Google labels "Usage Limits (Subject to Change)" (Source: [Upgrade Gemini
+Notebook](https://support.google.com/gemininotebook/answer/16213268?hl=en), read 2026-09-23). Each source is capped at 500,000 words or
+200 MB for local uploads, with no page limit (Source: [Gemini Notebook
+FAQ](https://support.google.com/gemininotebook/answer/16269187?hl=en), read 2026-09-23). A single build-doc can therefore grow far past the
+point where it should be split; the reason to split earlier is retrieval quality, not the cap.
+
 ---
 
 ## 2. Consulting a notebook (read path)
@@ -99,6 +107,17 @@ kb ask <KEY> "<an extensive, context-rich question>"
   query, and prints the grounded answer.
 
 Reading is non-destructive. Nothing you ask changes the corpus.
+
+*Dated note, 2026-09-23.* Reading is not free of quota. Since 2026-09-02 Gemini Notebook meters
+usage by compute — prompt complexity, models, features, chat length — and the quota "refreshes
+every 5 hours until you reach your weekly limit"; AI Plus is two times and AI Pro four times
+the standard allowance (Source: [Usage limits for Gemini Notebook](https://support.google.com/gemininotebook/answer/17670842?hl=en&co=GENIE.Platform%3DDesktop), read
+2026-09-23). A long chain of `ask` calls or studio generations can exhaust a window, so a
+scheduled agent must budget for a refused ask rather than assume a fixed daily count. The
+numbers themselves belong in the NONE bucket. The page meters prompts and generations, not
+listing sources, which is why the healthcheck's probe stays `source list` and never `ask`
+(observed, needs-verification). Whether `add-research` draws on the same quota is not stated
+on that page (needs-verification, 2026-09-23).
 
 ---
 
@@ -159,6 +178,11 @@ If a batch job or a retry left two copies, delete the stale one now. Duplicate
 sources make answers inconsistent (the model may cite the old text) and eat into
 the source cap.
 
+*Dated note, 2026-09-23.* Add-before-delete needs one spare slot under the plan's source cap
+— 50 per notebook on the standard plan as of 2026-09-23 (Source: [Upgrade Gemini
+Notebook](https://support.google.com/gemininotebook/answer/16213268?hl=en)). At the cap, the upload of the new version fails before the old
+source can be removed; keep a slot free, or split the notebook before it fills.
+
 ---
 
 ## 4. Web research (deep vs. fast)
@@ -197,6 +221,23 @@ kb source fulltext <KEY> <SOURCE_ID>      # correct: the actual text you can act
 `artifact export` gives you a packaged/rendered view; `source fulltext` gives you
 the raw ingested text you can quote, chunk, and route. Use fulltext.
 
+*Dated notes, 2026-09-23:*
+
+- **Absence from a list is not evidence of removal — on the studio path too.** Upstream
+  issue #2432 (opened 2026-09-21) reports that on 0.8.2 the artifact wait step inferred
+  `REMOVED` when a generation id was missing from the studio list, while the very next
+  `download` pulled a finished file; 2 false failures in 7 runs with a concurrent generation
+  on the same account. The fix, PR #2433, was merged on 2026-09-23 and is in no release
+  (Source: [notebooklm-py issue #2432](https://github.com/teng-lin/notebooklm-py/issues/2432)). Anyone adding audio or video
+  overview generation to this kit must verify by listing or downloading, the way
+  `research.sh` re-lists sources, and never by the wait verdict.
+- **The Studio surface keeps growing; the rule above does not move.** Google's back-to-school
+  update (rollout from 2026-09-15) adds real-time voice conversations in the mobile app, an
+  in-app audio recorder, learning overviews, new quiz formats and short video overviews
+  (Source: [Google Workspace Updates, 2026-09-18](https://workspaceupdates.googleblog.com/2026/09/new-back-to-school-features-and-learning-tools-available-in-Gemini-Notebook.html)). Raw text still comes from
+  `source fulltext`; each new artifact type is one more target for the polling problem in the
+  previous bullet.
+
 ---
 
 ## 5. Headless re-auth setup for deep research (one-time)
@@ -230,6 +271,23 @@ re-authenticate on its own.
 
 If deep research suddenly fails with an auth error, the stored session has expired:
 re-run `notebooklm login` once (interactively) to reseed it, and carry on.
+
+*Dated notes, 2026-09-23:*
+
+- **The default host is `notebook.google.com` since notebooklm-py 0.8.1** (2026-08-14);
+  `notebooklm.google.com` remains supported for existing setups (Source: [notebooklm-py v0.8.1
+  release](https://github.com/teng-lin/notebooklm-py/releases/tag/v0.8.1)). Upstream's configuration reference constrains
+  `NOTEBOOKLM_BASE_URL` to `https://notebook.google.com` (default), `https://notebooklm.google.com`
+  (pre-rebrand personal host) or `https://notebooklm.cloud.google.com` (enterprise); any other
+  host raises `ValueError`. The same reference lists `NOTEBOOKLM_HEADLESS_REAUTH` (enabled by the
+  literal `1`) and `NOTEBOOKLM_HEADLESS_REAUTH_CDP_URL` (loopback only) (Source: [notebooklm-py
+  docs/configuration.md](https://github.com/teng-lin/notebooklm-py/blob/main/docs/configuration.md), read 2026-09-23).
+- **When 0.9 lands, re-test before the pin moves.** Upstream `main` already labels its
+  unreleased work as v0.9 (Source: [notebooklm-py CHANGELOG, Unreleased](https://github.com/teng-lin/notebooklm-py/blob/main/CHANGELOG.md), read
+  2026-09-23). What to re-run against it: the CLI shape of `source add` / `list` / `delete` /
+  `fulltext`, `source add-research` with `--from web --import-all --mode`, `ask`, `auth refresh`,
+  and the five real-CLI parse tests in `tests/run.sh`; then move the pin in every file that
+  carries it and update the mock in `tests/bin/notebooklm`.
 
 ---
 

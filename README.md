@@ -124,6 +124,21 @@ The full rule, with worked examples, is in
 > product, there is no supported API behind it, and neither this repository nor
 > `notebooklm-py` is affiliated with or endorsed by Google.
 >
+> *Dated note, 2026-09-23.* Two things have moved around the paragraph above without changing it:
+>
+> - **The product is now called Gemini Notebook.** Google renamed NotebookLM to Gemini Notebook on
+>   2026-07-16, "the same standalone product"; existing shared notebooks and links keep working
+>   through automatic redirects (Source: [blog.google](https://blog.google/innovation-and-ai/products/gemini-notebook/notebooklm-gemini-notebook/),
+>   [Google Workspace Updates](https://workspaceupdates.googleblog.com/2026/07/notebooklm-now-gemini-notebook.html)). This repository, the `notebooklm-py`
+>   package and the `notebooklm` command keep the old name.
+> - **"No supported API" is true of the consumer product this kit drives.** Google Cloud publishes a
+>   Preview API (Pre-GA terms) for *Gemini Notebook Enterprise* that covers notebooks, sources and
+>   audio overviews; its documented pages contain no ask/chat operation as of 2026-09-23, so it
+>   does not replace the browser-session CLI for this kit's read path (Source: Gemini Notebook
+>   Enterprise API, [notebooks](https://docs.cloud.google.com/gemini/enterprise/notebooklm-enterprise/docs/api-notebooks) and [sources](https://docs.cloud.google.com/gemini/enterprise/notebooklm-enterprise/docs/api-notebooks-sources), both
+>   "Last updated 2026-09-22 UTC"). The absence of a query endpoint is an observation of those
+>   pages, not a Google statement.
+>
 > What follows from that, in practice:
 >
 > - **Google can break it without notice.** A change to NotebookLM's web app is enough.
@@ -181,6 +196,20 @@ Prefer to run each step yourself, or need to troubleshoot? Follow the guide for 
 **When `notebooklm-py` releases 0.9**, this kit does not follow automatically. The pin has
 to be raised deliberately, after checking that the CLI shape the scripts depend on has not
 changed again — which is the whole reason the pin exists.
+
+*Dated notes, 2026-09-23:*
+
+- 0.8.2, released 2026-09-02, is the latest `notebooklm-py` on PyPI, so the `>=0.8.2,<0.9` pin
+  currently resolves to exactly one release; `Requires-Python` is still `>=3.10`
+  (Source: [PyPI JSON for notebooklm-py](https://pypi.org/pypi/notebooklm-py/json)).
+- Upstream `main` already labels its unreleased work as v0.9: the Unreleased section of its
+  changelog deprecates `client.rpc_call(...)` "in v0.9.0 for removal in v1.0" and makes the MCP
+  stdio `source_add` host-path file-add default-deny (Source: [notebooklm-py CHANGELOG,
+  Unreleased](https://github.com/teng-lin/notebooklm-py/blob/main/CHANGELOG.md), read 2026-09-23). The pin will therefore exclude the very next
+  upstream release by design; the real-CLI test block has to pass against 0.9 before it moves.
+- Python 3.10 reaches end of life in October 2026 (Source: [Python Developer's Guide,
+  versions](https://devguide.python.org/versions/)). The 3.10 floor is upstream's declaration, not this kit's choice;
+  when upstream raises it, the installer's check follows.
 
 ### What the tests cover, and what they do not
 
@@ -396,6 +425,11 @@ gathering, then have the agent verify the load-bearing claims.
 No. It's an independent, open-source (AGPL-3.0-or-later) workflow built on top of the unofficial
 `notebooklm-py` CLI by Teng Lin (<https://github.com/teng-lin/notebooklm-py>, MIT); tested with
 notebooklm-py 0.8.2. It isn't affiliated with, endorsed by, or supported by Google or NotebookLM.
+*Dated note, 2026-09-23.* Google renamed the product Gemini Notebook on 2026-07-16 (Source:
+[blog.google](https://blog.google/innovation-and-ai/products/gemini-notebook/notebooklm-gemini-notebook/)); the names in this repository and in the CLI are unchanged.
+The upstream 0.8.2 release notes say of its own transports that "both backends rely on
+undocumented Google APIs and may change without notice" (Source: [notebooklm-py v0.8.2
+release](https://github.com/teng-lin/notebooklm-py/releases/tag/v0.8.2)).
 
 ---
 

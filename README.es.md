@@ -1,4 +1,4 @@
-<!-- synced-from: 84f5879a95566450c255686c84dbb117665a5ed1 -->
+<!-- synced-from: ae5c87b3d094be05e291c31c900894e8b3705db2 -->
 # NotebookLM KB System — un "segundo cerebro" eficiente en tokens para agentes de IA
 
 **English**: [README.md](README.md) · [Español](README.es.md)
@@ -129,6 +129,21 @@ La regla completa, con ejemplos resueltos, está en
 > de Google, no hay una API soportada por detrás, y ni este repositorio ni `notebooklm-py`
 > están afiliados a Google ni respaldados por Google.
 >
+> *Nota fechada, 2026-09-23.* Dos cosas se han movido alrededor del párrafo anterior sin cambiarlo:
+>
+> - **El producto se llama ahora Gemini Notebook.** Google renombró NotebookLM a Gemini Notebook el
+>   2026-07-16, «el mismo producto independiente»; los cuadernos compartidos y los enlaces existentes
+>   siguen funcionando mediante redirecciones automáticas (Fuente: [blog.google](https://blog.google/innovation-and-ai/products/gemini-notebook/notebooklm-gemini-notebook/),
+>   [Google Workspace Updates](https://workspaceupdates.googleblog.com/2026/07/notebooklm-now-gemini-notebook.html)). Este repositorio, el paquete `notebooklm-py`
+>   y el comando `notebooklm` conservan el nombre antiguo.
+> - **«No hay una API soportada» es cierto del producto de consumo que maneja este kit.** Google Cloud
+>   publica una API en vista previa (términos Pre-GA) para *Gemini Notebook Enterprise* que cubre
+>   cuadernos, fuentes y resúmenes de audio; sus páginas documentadas no contienen ninguna operación
+>   de pregunta/chat a 2026-09-23, así que no sustituye a la CLI de sesión de navegador para la ruta de
+>   lectura de este kit (Fuente: API de Gemini Notebook Enterprise, [cuadernos](https://docs.cloud.google.com/gemini/enterprise/notebooklm-enterprise/docs/api-notebooks) y
+>   [fuentes](https://docs.cloud.google.com/gemini/enterprise/notebooklm-enterprise/docs/api-notebooks-sources), ambas «Last updated 2026-09-22 UTC»). La ausencia de un endpoint
+>   de consulta es una observación de esas páginas, no una afirmación de Google.
+>
 > Lo que se sigue de eso, en la práctica:
 >
 > - **Google puede romperlo sin avisar.** Basta con un cambio en la aplicación web de
@@ -187,6 +202,21 @@ además `sudo ~/.kb/venv/bin/playwright install-deps chromium`
 **Cuando `notebooklm-py` publique la 0.9**, este kit no la sigue automáticamente. El pin hay que
 subirlo a propósito, después de comprobar que la forma de la CLI de la que dependen los scripts no
 ha vuelto a cambiar — que es justo la razón por la que el pin existe.
+
+*Notas fechadas, 2026-09-23:*
+
+- La 0.8.2, publicada el 2026-09-02, es la última `notebooklm-py` en PyPI, así que el pin
+  `>=0.8.2,<0.9` resuelve hoy a exactamente una versión; `Requires-Python` sigue siendo `>=3.10`
+  (Fuente: [JSON de PyPI para notebooklm-py](https://pypi.org/pypi/notebooklm-py/json)).
+- La rama `main` de aguas arriba ya etiqueta su trabajo no publicado como v0.9: la sección Unreleased
+  de su changelog marca `client.rpc_call(...)` como obsoleto «in v0.9.0 for removal in v1.0» y hace
+  que el `source_add` por ruta de host del MCP stdio sea denegado por defecto (Fuente: [CHANGELOG de
+  notebooklm-py, Unreleased](https://github.com/teng-lin/notebooklm-py/blob/main/CHANGELOG.md), leído el 2026-09-23). El pin excluirá por tanto la
+  siguiente versión de aguas arriba por diseño; el bloque de pruebas con la CLI real tiene que pasar
+  contra la 0.9 antes de moverlo.
+- Python 3.10 llega a su fin de vida en octubre de 2026 (Fuente: [Python Developer's Guide,
+  versions](https://devguide.python.org/versions/)). El mínimo 3.10 es una declaración de aguas arriba, no una elección de
+  este kit; cuando aguas arriba lo suba, la comprobación del instalador lo seguirá.
 
 ### Qué cubren las pruebas y qué no
 
@@ -410,6 +440,11 @@ recolección amplia, y que después el agente verifique las afirmaciones que sos
 No. Es un flujo de trabajo independiente y de código abierto (AGPL-3.0-or-later) construido sobre la CLI no
 oficial `notebooklm-py` de Teng Lin (<https://github.com/teng-lin/notebooklm-py>, MIT); probado con
 notebooklm-py 0.8.2. No está afiliado a Google ni a NotebookLM, ni respaldado ni soportado por ellos.
+*Nota fechada, 2026-09-23.* Google renombró el producto a Gemini Notebook el 2026-07-16 (Fuente:
+[blog.google](https://blog.google/innovation-and-ai/products/gemini-notebook/notebooklm-gemini-notebook/)); los nombres en este repositorio y en la CLI no cambian. Las notas de
+la versión 0.8.2 de aguas arriba dicen de sus propios transportes que «both backends rely on
+undocumented Google APIs and may change without notice» (Fuente: [notebooklm-py v0.8.2
+release](https://github.com/teng-lin/notebooklm-py/releases/tag/v0.8.2)).
 
 ---
 

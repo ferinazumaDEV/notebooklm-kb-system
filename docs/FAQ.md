@@ -58,6 +58,25 @@ What happens:
 Ask with long, specific questions. NotebookLM answers a well-framed question far better than a
 keyword — include what you're doing, what you already know, and what you need out of it.
 
+*Dated notes, 2026-09-23:*
+
+- **Long has an upper bound on the `ask` path.** Upstream issue #2425 (opened 2026-09-15,
+  closed 2026-09-20) shows that when a chat request's prompt plus pinned-source payload is too
+  large, the server rejects it with status 3 (`INVALID_ARGUMENT`) and the CLI reports it as "No
+  parseable chunks in streaming chat response … the API wire format may have changed"; the
+  reporter measured failure above roughly 5,100 characters and success below roughly 4,500 with
+  the same pins (Source: [notebooklm-py issue #2425](https://github.com/teng-lin/notebooklm-py/issues/2425)). The threshold is the
+  reporter's measurement on CLI 0.7.3, not a maintainer statement (needs-verification,
+  2026-09-23). The misleading message is a 0.7.3 parser bug fixed in 0.8.0 (#1636); on the 0.8.2
+  this kit pins the rejection is reported as `ChatError` with server status 3, and the maintainer
+  states the character range "should be treated as an observation for that request, not a
+  guaranteed API limit" (Source: [notebooklm-py issue #2425, maintainer comment 2026-09-20](https://github.com/teng-lin/notebooklm-py/issues/2425)).
+  Treat that error as a possible oversize prompt before assuming Google changed the UI.
+- **Step 2 above is justified again from upstream.** Issue #2432 (opened 2026-09-21) reports
+  that on 0.8.2 the studio wait step reported `REMOVED` for generations that had in fact
+  finished (Source: [notebooklm-py issue #2432](https://github.com/teng-lin/notebooklm-py/issues/2432)). Verification by re-listing
+  is the pattern, not a quirk of the research wrapper.
+
 ## What's the difference between `fast` and `deep` research?
 
 - **fast** — a quick, shallow sweep. No extra login needed.
@@ -101,6 +120,39 @@ That's roughly **1.9M → ~5K agent tokens, about a 99% reduction** for a broad 
 savings compound: re-querying an existing notebook with `notebooklm ask` is a few-K-token read forever,
 versus re-running the whole recon. (These are order-of-magnitude figures; plug in your own token
 rates for cost.)
+
+*Scope, restated 2026-09-23.* The ~99% is one task, run one time, counting only the output tokens
+billed to the agent; NotebookLM's own compute is not counted, the two outputs were not scored
+for equal quality, and run-to-run variability was not measured. It is a documented observation,
+not a rate — the same scope the README gives it.
+
+## How much can I ask per day?
+
+*Dated answer, 2026-09-23.* There is no fixed daily count any more. Since 2026-09-02 Gemini
+Notebook meters usage by compute — prompt complexity, models, features, chat length — and the
+quota "refreshes every 5 hours until you reach your weekly limit"; AI Plus is two times and AI
+Pro four times the standard allowance, AI Ultra "5x or 20x higher than AI Pro depending on your
+subscription" (Source: [Usage limits for Gemini Notebook](https://support.google.com/gemininotebook/answer/17670842?hl=en&co=GENIE.Platform%3DDesktop)). A scheduled agent
+should budget for a refused ask rather than count on a number.
+
+The limits Google publishes on the same date, all tagged "Subject to Change" (Source: [Upgrade
+Gemini Notebook](https://support.google.com/gemininotebook/answer/16213268?hl=en), read 2026-09-23):
+
+| Plan (2026-09-23) | Sources per notebook | Chats per day | Audio Overviews per day |
+|---|---|---|---|
+| Gemini Notebook (standard) | 50 | 50 | 3 |
+| AI Plus | 100 | 200 | 6 |
+| AI Pro | 300 | 500 | 20 |
+| AI Ultra (20 TB) | 500 | 2.5K | 100 |
+| AI Ultra (30 TB) | 600 | 5K | 200 |
+
+Each source is capped at 500,000 words or 200 MB for local uploads, with no page limit (Source:
+[Gemini Notebook FAQ](https://support.google.com/gemininotebook/answer/16269187?hl=en), read 2026-09-23).
+
+Two things to keep in view: the per-day chat counts on the upgrade page and the compute-based
+model on the usage-limits page are both live on 2026-09-23 and Google has not reconciled them;
+and every number here is perishable — it belongs in the NONE bucket, checked at the source when
+it matters, never quoted from memory.
 
 ## When should I NOT use NotebookLM research?
 
@@ -152,6 +204,41 @@ workflow on top of the unofficial `notebooklm-py` CLI by Teng Lin
 (<https://github.com/teng-lin/notebooklm-py>, MIT); tested with notebooklm-py 0.8.2. It is not
 affiliated with, endorsed by, or supported by
 Google or NotebookLM. NotebookLM is a product of Google; this repo is a separate community tool.
+
+*Dated notes, 2026-09-23:*
+
+- **Google renamed NotebookLM to Gemini Notebook on 2026-07-16**, "the same standalone product";
+  automatic redirects keep existing shared notebooks and links working (Source:
+  [blog.google](https://blog.google/innovation-and-ai/products/gemini-notebook/notebooklm-gemini-notebook/), [Google Workspace Updates](https://workspaceupdates.googleblog.com/2026/07/notebooklm-now-gemini-notebook.html)). This
+  repository, the `notebooklm-py` package and the `notebooklm` command keep the old name.
+- **Upstream says so itself.** The notebooklm-py 0.8.2 release notes state that "both backends
+  rely on undocumented Google APIs and may change without notice" (Source: [notebooklm-py v0.8.2
+  release](https://github.com/teng-lin/notebooklm-py/releases/tag/v0.8.2)).
+- **"Notebooks in Gemini" are a different thing.** The Gemini app's own notebooks, rolled out to
+  schools and organisations from 2026-09-14, take up to 10 sources each and are a Gemini-app
+  feature (Source: [Google Workspace Updates, 2026-09-17](https://workspaceupdates.googleblog.com/2026/09/notebooks-in-gemini-dedicated-workspace-for-focused-organized-work-now-for-schools-and-organizations.html)). This kit, the ids
+  in `notebooks.json` and the CLI address Gemini Notebook notebooks only.
+
+## Is there an official API?
+
+*Dated answer, 2026-09-23.* For the consumer product this kit drives, no. For the enterprise
+edition, a Preview API exists under Pre-GA terms: it creates, gets, lists, deletes and shares
+notebooks, adds sources (Google Docs, Google Slides, raw text, web content, YouTube videos,
+file upload) and creates an audio overview (Source: Gemini Notebook Enterprise API,
+[notebooks](https://docs.cloud.google.com/gemini/enterprise/notebooklm-enterprise/docs/api-notebooks) and [sources](https://docs.cloud.google.com/gemini/enterprise/notebooklm-enterprise/docs/api-notebooks-sources), both "Last updated
+2026-09-22 UTC"). The documented pages contain no ask/chat operation; that is an observation
+of those pages on 2026-09-23, not a Google statement, and it is why the enterprise API does
+not replace the browser-session CLI for this kit's read path.
+
+- The 2026-07-16 rename did not move the endpoints: "the product functionality remains the
+  same, and the APIs still use the same endpoints" (Source: [Gemini Enterprise release notes,
+  entry of July 16, 2026](https://docs.cloud.google.com/gemini/enterprise/docs/release-notes)).
+- Inside a VPC Service Controls perimeter, website URLs cannot be added as notebook sources
+  because "direct website ingestion performs a live web crawl, generating outbound traffic
+  beyond Google networks"; Google Docs and YouTube URLs remain supported (Source: [Gemini
+  Enterprise release notes, entry of September 09, 2026, labelled Breaking](https://docs.cloud.google.com/gemini/enterprise/docs/release-notes)).
+  The web search-and-ingest that `research.sh` drives has no enterprise equivalent inside such
+  a perimeter as of that date.
 
 ## What do I need to install it?
 

@@ -144,6 +144,17 @@ That final **GAPS** section turns the query into a coverage report. When it's
 empty, the notebook had you covered. When it isn't, you get your next
 add-research list for free.
 
+*Dated note, 2026-09-23.* The long, context-rich prompt this section recommends has an upper
+bound on the `ask` path (not on the add-research path). Upstream issue #2425 shows an oversize
+prompt-plus-pins payload rejected server-side with status 3 (`INVALID_ARGUMENT`); on the 0.8.2
+this kit pins it surfaces as `ChatError` advising the caller to shorten the request (on CLI 0.7.3
+it was misreported as "No parseable chunks in streaming chat response", a parser bug fixed in
+0.8.0). The reporter's roughly 4,500 to 5,100 characters is an observation on 0.7.3 that the
+maintainer explicitly does not confirm as a limit: "an observation for that request, not a
+guaranteed API limit" (Source: [notebooklm-py issue #2425, maintainer comment 2026-09-20](https://github.com/teng-lin/notebooklm-py/issues/2425)).
+If that error appears, shorten or split the ask; staying under ~4,500 characters is a working
+heuristic from one report, not a limit.
+
 ---
 
 ## 3. What NotebookLM WON'T do — add this yourself on top
@@ -162,6 +173,11 @@ did.
 | **Know anything outside its sources** | "NOT IN SOURCES" is a real boundary, not laziness. It has no opinion on what it wasn't given. | Add-research to ingest the missing sources, then ask again. |
 | **Stay current on its own** | The sources are a snapshot from when they were ingested. It doesn't find out the world changed. | A refresh cadence: re-ingest volatile topics; treat versions/prices/limits as perishable. |
 | **Track live/mutable state** | It's reference memory, not a status dashboard. Disk %, the current IP, "is the service up right now?" are never notebook facts. | Check the live system directly; never store or ask the notebook for live state. |
+
+*Dated example for the "Stay current" row, 2026-09-23:* the product's own quota model changed on
+2026-09-02, from per-day counts to compute-based limits with a 5-hour refresh and a weekly cap
+(Source: [Usage limits for Gemini Notebook](https://support.google.com/gemininotebook/answer/17670842?hl=en&co=GENIE.Platform%3DDesktop)). Any limit a notebook ingested
+before that date is now a snapshot of the old model.
 
 ### The division of labor
 
