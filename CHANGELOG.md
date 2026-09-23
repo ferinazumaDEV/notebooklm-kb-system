@@ -9,6 +9,19 @@ upgrade path.
 
 ## [Unreleased]
 
+### Added
+
+- **`.zenodo.json`.** Zenodo's GitHub integration archived v0.1.0 and v0.1.1 with the
+  licence id `apgl-v3`, which is not in Zenodo's licence vocabulary, while the
+  repository declares AGPL-3.0-or-later; adding `CITATION.cff` did not change it
+  (measured on the v0.1.1 record). This file hands Zenodo the licence explicitly,
+  as the vocabulary id `agpl-3.0-or-later` (checked against
+  `/api/vocabularies/licenses/agpl-3.0-or-later`), together with title, creators,
+  description and keywords copied from `CITATION.cff`. Whether it fixes the
+  archived licence is verified on the next release by reading
+  `metadata.license.id` from the new Zenodo record; until then this is a change
+  in what we send, not a claim about what Zenodo records.
+
 ### Changed
 
 - **The licence is now AGPL-3.0-or-later, stated everywhere.** Until this change the

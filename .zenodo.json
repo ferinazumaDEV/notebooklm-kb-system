@@ -1,0 +1,27 @@
+{
+  "title": "notebooklm-kb-system",
+  "description": "A kit of shell scripts that turns a NotebookLM notebook into a queryable knowledge base for an agent: build documents from sources, publish them, ask questions from a terminal, and degrade to a local copy when the session is not available. It is not affiliated with Google, and it is built on an unofficial interface, so anything it depends on can change without notice.",
+  "creators": [
+    {
+      "name": "Aporta Franco, Fernando"
+    }
+  ],
+  "license": "agpl-3.0-or-later",
+  "upload_type": "software",
+  "access_right": "open",
+  "keywords": [
+    "notebooklm",
+    "knowledge base",
+    "retrieval",
+    "agent tooling",
+    "shell"
+  ],
+  "related_identifiers": [
+    {
+      "identifier": "https://github.com/ferinazumaDEV/notebooklm-kb-system",
+      "relation": "isSupplementTo",
+      "resource_type": "software",
+      "scheme": "url"
+    }
+  ]
+}
