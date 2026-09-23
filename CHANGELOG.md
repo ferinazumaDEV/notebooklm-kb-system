@@ -9,6 +9,12 @@ upgrade path.
 
 ## [Unreleased]
 
+## [0.1.2] — 2026-09-23
+
+One purpose: find out, on a real record, whether `.zenodo.json` fixes the archived
+licence id. Everything else in this version is the licence wording change that was
+already on `main`.
+
 ### Added
 
 - **`.zenodo.json`.** Zenodo's GitHub integration archived v0.1.0 and v0.1.1 with the

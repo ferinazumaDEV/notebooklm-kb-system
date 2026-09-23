@@ -45,5 +45,5 @@ keywords:
   - shell
 # version and date-released are bumped together with the git tag. The tag is the
 # source of truth; these two are the copy the citation format requires.
-version: "0.1.1"
-date-released: "2026-09-22"
+version: "0.1.2"
+date-released: "2026-09-23"
