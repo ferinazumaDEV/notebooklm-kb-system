@@ -131,3 +131,5 @@ The origin API returns `NotFoundExc` while indexing, which is a false negative r
   the cited object does not move.
 - **Never change the licence in `CITATION.cff` alone.** That file follows `LICENSE` and the README, it does not
   lead them.
+
+> **Licence check (added 2026-09-23).** After the Zenodo record exists, read its metadata and compare `metadata.license.id` with the `license` value in `.zenodo.json` (`agpl-3.0-or-later`). Records v0.1.0 and v0.1.1 carry `apgl-v3`; if the new record still does, `.zenodo.json` did not fix it and the next thing to try is a manual edit of the record on zenodo.org.
