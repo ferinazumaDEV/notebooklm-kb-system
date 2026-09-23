@@ -132,4 +132,6 @@ The origin API returns `NotFoundExc` while indexing, which is a false negative r
 - **Never change the licence in `CITATION.cff` alone.** That file follows `LICENSE` and the README, it does not
   lead them.
 
+> **Licence check — result (2026-09-23).** Verified on v0.1.2: Zenodo record 10.5281/zenodo.22923166 carries `metadata.license.id = agpl-3.0-or-later`, the value `.zenodo.json` declares. Records v0.1.0 and v0.1.1 keep `apgl-v3` (old records are not edited). `.zenodo.json` fixes the archived licence; `CITATION.cff` alone did not. The deposit stayed in state "Received" for about 55 minutes before the record existed, while zenodo.org showed a slowness notice; poll for up to an hour before suspecting the deposit. The GitHub webhook sends three events per Release (published, released, created): Zenodo answers 202 to one and 409 to the other two, which is normal.
+>
 > **Licence check (added 2026-09-23).** After the Zenodo record exists, read its metadata and compare `metadata.license.id` with the `license` value in `.zenodo.json` (`agpl-3.0-or-later`). Records v0.1.0 and v0.1.1 carry `apgl-v3`; if the new record still does, `.zenodo.json` did not fix it and the next thing to try is a manual edit of the record on zenodo.org.
