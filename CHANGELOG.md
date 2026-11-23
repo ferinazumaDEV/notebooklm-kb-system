@@ -27,6 +27,20 @@ upgrade path.
   status 3, issue #2425; the studio wait step reported `REMOVED` for finished generations,
   issue #2432);
   and Python 3.10, the floor upstream declares, reaches end of life in October 2026.
+- **Dated notes (2026-11-23), from re-opening upstream and Google sources.** Nothing earlier is
+  rewritten; the 2026-09-23 notes describe that day.
+  - PyPI lists `notebooklm-py` 0.8.6, uploaded 2026-10-29, as the latest release, after 0.8.3
+    (2026-09-26), 0.8.4 (2026-10-01) and 0.8.5 (2026-10-13); `Requires-Python` is still `>=3.10`
+    (Source: [PyPI, release 0.8.6](https://pypi.org/project/notebooklm-py/0.8.6/) and the
+    [PyPI JSON record](https://pypi.org/pypi/notebooklm-py/json), read 2026-11-23). The pin
+    `>=0.8.2,<0.9` therefore now admits five releases, not one, and no 0.9 is published. This
+    kit's scripts were not exercised against 0.8.3–0.8.6 in this review, so nothing is claimed
+    about their behaviour on those releases.
+  - A Google Workspace Updates post dated 2026-11-18 says Gemini Notebook "can now turn sources
+    into interactive sites" (web, gradual rollout from 2026-11-16) (Source:
+    [Google Workspace Updates](https://workspaceupdates.googleblog.com/2026/11/transform-your-notes-and-research-into-dynamic-tools-with-Gemini-Notebook.html)).
+    The post says nothing about an API, source limits or sessions, and this kit does not drive
+    that output type.
 
 ### Changed
 
